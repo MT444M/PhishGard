@@ -1,0 +1,22 @@
+# exclure les credentials
+# .env file
+.env
+
+# secret key
+client_secret.json
+# token file
+token.json
+
+# json files
+*.json
+
+# Ignore temporary files
+__pycache__/
+output/
+
+# Ignore model files
+*.pkl
+
+# Ignore log files
+*.log
+

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhishingDetector Pro</title>
+    <link rel="stylesheet" href="css/style.css">
+
+    
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">
+                <div class="shield-icon">🛡️</div>
+                PhishingDetector Pro
+            </div>
+            <div class="user-info">
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-number">1,247</div>
+                        <div>Emails analysés</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">89</div>
+                        <div>Phishing détectés</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">99.2%</div>
+                        <div>Précision</div>
+                    </div>
+                </div>
+                <div>👤 admin@company.com</div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <div class="filter-section">
+                    <div class="filter-title">Statut</div>
+                    <div class="filter-item active">
+                        <span>📧 Tous les emails</span>
+                        <span class="badge">1247</span>
+                    </div>
+                    <div class="filter-item phishing">
+                        <span>⚠️ Phishing</span>
+                        <span class="badge">89</span>
+                    </div>
+                    <div class="filter-item suspicious">
+                        <span>🔍 Suspects</span>
+                        <span class="badge">156</span>
+                    </div>
+                    <div class="filter-item legitimate">
+                        <span>✅ Légitimes</span>
+                        <span class="badge">1002</span>
+                    </div>
+                </div>
+                
+                <div class="filter-section">
+                    <div class="filter-title">Catégories</div>
+                    <div class="filter-item">
+                        <span>💼 Professionnel</span>
+                        <span class="badge">567</span>
+                    </div>
+                    <div class="filter-item">
+                        <span>🛒 E-commerce</span>
+                        <span class="badge">234</span>
+                    </div>
+                    <div class="filter-item">
+                        <span>🏦 Banque</span>
+                        <span class="badge">123</span>
+                    </div>
+                    <div class="filter-item">
+                        <span>📰 Newsletter</span>
+                        <span class="badge">189</span>
+                    </div>
+                </div>
+                
+                <div class="filter-section">
+                    <div class="filter-title">Période</div>
+                    <div class="filter-item">
+                        <span>📅 Aujourd'hui</span>
+                        <span class="badge">47</span>
+                    </div>
+                    <div class="filter-item">
+                        <span>📅 Cette semaine</span>
+                        <span class="badge">312</span>
+                    </div>
+                    <div class="filter-item">
+                        <span>📅 Ce mois</span>
+                        <span class="badge">1247</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main Panel -->
+            <div class="main-panel">
+                <div class="toolbar">
+                    <div class="search-bar">
+                        <input type="text" class="search-input" placeholder="Rechercher dans les emails...">
+                        <button class="btn btn-primary">🔍 Rechercher</button>
+                    </div>
+                    <div>
+                        <button class="btn btn-secondary">📊 Exporter</button>
+                        <button class="btn btn-primary">⚙️ Paramètres</button>
+                    </div>
+                </div>
+                <!-- Email List -->
+                <div class="email-list" id="email-list-container"> </div>
+                
+            </div>
+        </div>
+    </div>
+
+   
+
+    <!-- Modal -->
+    <div class="modal" id="emailModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <div class="modal-title" id="modal-title">Analyse détaillée</div>
+            <span class="close" onclick="closeModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="analysis-grid">
+                <div class="analysis-card" id="card-heuristic"> <div class="card-title">📧 Analyse Heuristique</div>
+                    <div class="card-score" id="score-heuristic">--%</div> <p id="reason-heuristic">En attente d'analyse...</p> </div>
+                
+                <div class="analysis-card" id="card-url"> <div class="card-title">🔗 Analyse des Liens (Modèle ML)</div>
+                    <div class="card-score" id="score-url">--%</div> <p id="reason-url">En attente d'analyse...</p> </div>
+                
+                <div class="analysis-card" id="card-llm"> <div class="card-title">🤖 Analyse LLM</div>
+                    <div class="card-score" id="score-llm">--%</div> <p id="reason-llm">En attente d'analyse...</p> </div>
+                
+                <div class="analysis-card" id="card-osint"> <div class="card-title">🔍 Enrichissement OSINT</div>
+                    <div class="card-score" style="color: #6c757d;">INFO</div>
+                    <p id="reason-osint">En attente d'analyse...</p> </div>
+            </div>
+            
+            <div class="email-content">
+                <h4>📧 Contenu de l'email (Prévisualisation)</h4>
+                <div class="email-body" id="email-body-content">
+                    Le contenu de l'email s'affichera ici...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+
+</body>
+</html>
