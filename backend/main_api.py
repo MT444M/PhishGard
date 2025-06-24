@@ -66,21 +66,39 @@ def root():
 def read_root():
     return {"status": "PhishGard-AI API est en ligne"}
 
+
+
 @app.get("/api/emails")
 def get_email_list():
     """
-    Endpoint pour récupérer la liste des emails à afficher dans le tableau de bord.
-    POUR L'INSTANT: Renvoie des données de maquette.
-    PLUS TARD: Pourra appeler `email_client.get_emails()` pour des données réelles.
+    Endpoint pour récupérer la liste des emails depuis le service Gmail.
     """
-    # Ces données correspondent à votre maquette
-    mock_emails = [
-        {"id": "1", "sender": "security@paypaI-verify.com", "subject": "Action requise : Vérification de votre compte PayPal", "preview": "Votre compte a été temporairement suspendu...", "timestamp": "Il y a 2 heures", "verdict": "Phishing", "confidence": "94%"},
-        {"id": "2", "sender": "noreply@amazon.com", "subject": "Votre commande a été expédiée", "preview": "Bonjour, votre commande #123456789 a été expédiée...", "timestamp": "Il y a 4 heures", "verdict": "Suspicious", "confidence": "67%"},
-        {"id": "3", "sender": "notification@github.com", "subject": "[GitHub] Nouvelle pull request sur votre repository", "preview": "Une nouvelle pull request a été soumise par john.doe...", "timestamp": "Il y a 6 heures", "verdict": "Legitime", "confidence": "12%"},
-        {"id": "4", "sender": "admin@microsoft-security.net", "subject": "Alerte de sécurité Microsoft - Connexion suspecte", "preview": "Nous avons détecté une connexion suspecte...", "timestamp": "Hier", "verdict": "Phishing", "confidence": "91%"}
-    ]
-    return mock_emails
+    if not gmail_service:
+        raise HTTPException(status_code=503, detail="Service Gmail non disponible.")
+    
+    try:
+        # Récupère les 25 derniers emails de la boîte de reception
+        live_emails = email_client.get_emails(gmail_service, max_results= 1)
+        
+        # Formatte les données pour le frontend.
+        # Notez qu'il n'y a PAS de verdict ou de score ici au début.
+        formatted_emails = []
+        for email in live_emails:
+            formatted_emails.append({
+                "id": email.get('id'),
+                "sender": email.get('sender'),
+                "subject": email.get('subject'),
+                "preview": email.get('snippet', ''), # Le snippet de l'API Gmail est parfait pour l'aperçu
+                "timestamp": "N/A" # L'API Gmail fournit une date plus complexe à parser, on la laisse de côté pour l'instant
+            })
+        return formatted_emails
+        
+    except Exception as e:
+        print(f"Erreur lors de la récupération des emails live: {e}")
+        raise HTTPException(status_code=500, detail=f"Une erreur est survenue lors de la récupération des emails: {e}")
+    
+
+    
 
 @app.post("/api/analyze/url")
 def analyze_url(request: URLAnalyzeRequest):

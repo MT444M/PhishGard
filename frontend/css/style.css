@@ -138,6 +138,7 @@ body {
     flex: 1;
     display: flex;
     flex-direction: column;
+    overflow: hidden;  /* S'assure que le panneau principal ne déborde pas */
 }
 
 .toolbar {
@@ -235,6 +236,7 @@ body {
 .email-info {
     flex: 1;
     min-width: 0;
+    min-width: 0; /* Permet de gérer le débordement du texte */
 }
 
 .email-header {
@@ -403,6 +405,10 @@ body {
     overflow-y: auto;
 }
 
+.text-muted {
+    color: #6c757d;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .main-content {
@@ -417,4 +423,29 @@ body {
     .analysis-grid {
         grid-template-columns: 1fr;
     }
+}
+
+
+/* style pour l'icône de chargement  */
+.spinner {
+    width: 12px;
+    height: 12px;
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    border-left-color: #007bff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    flex-shrink: 0;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.loading-message {
+    padding: 2rem;
+    text-align: center;
+    color: #6c757d;
+    font-style: italic;
 }

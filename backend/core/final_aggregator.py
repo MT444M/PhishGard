@@ -103,6 +103,7 @@ class FinalAggregator:
         report["breakdown"] = {
              "heuristic_analysis": self.heuristic_results,
              "url_ml_analysis": self.url_model_results,
-             "llm_analysis": self.llm_results
+             "llm_analysis": self.llm_results,
+             "osint_enrichment": self.osint_results  # Ajout OSINT complet 
         }
         return report
