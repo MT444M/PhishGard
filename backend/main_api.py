@@ -132,7 +132,8 @@ def analyze_email(request: EmailAnalyzeRequest):
         
         # 2. Lancer l'analyse complète via l'orchestrateur
         final_report = email_orchestrator.run_full_analysis(email_data)
-        
+
+
         return final_report
     except Exception as e:
         # Pour le débuggage, il est utile d'imprimer l'erreur côté serveur

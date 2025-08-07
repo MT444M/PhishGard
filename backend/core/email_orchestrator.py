@@ -96,6 +96,9 @@ class EmailOrchestrator:
         )
         final_verdict_report = aggregator.calculate_final_verdict()
         print("--- Analyse complète terminée. ---")
+
+        # pour debug
+        print(json.dumps(final_verdict_report, indent=2, ensure_ascii=False))
         
         # Le rapport final de l'orchestrateur est maintenant le rapport de l'agrégateur
         return final_verdict_report

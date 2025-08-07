@@ -449,3 +449,276 @@ body {
     color: #6c757d;
     font-style: italic;
 }
+
+
+/* =================================== */
+/* NOUVEAUX STYLES POUR LA MODALE V2   */
+/* =================================== */
+
+/* On supprime les anciennes marges et padding de la modale */
+.modal-content {
+    padding: 0;
+}
+
+/* Bannière de verdict */
+.modal-verdict-banner {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1.5rem 2rem;
+    color: white;
+    border-radius: 10px 10px 0 0;
+    justify-content: space-between;
+}
+.verdict-icon {
+    font-size: 2.5rem;
+}
+.verdict-text {
+    font-size: 1.8rem;
+    font-weight: bold;
+}
+.verdict-confidence {
+    font-size: 1rem;
+    opacity: 0.9;
+}
+.modal-verdict-banner .close {
+    color: white;
+    opacity: 0.8;
+    font-size: 2.5rem;
+}
+
+/* Classes de couleur pour la bannière */
+.verdict-legitime { background: linear-gradient(135deg, #28a745, #218838); }
+.verdict-suspicious { background: linear-gradient(135deg, #ffc107, #e0a800); color: #212529; }
+.verdict-suspicious .close { color: #212529; }
+.verdict-phishing { background: linear-gradient(135deg, #dc3545, #c82333); }
+.verdict-pending { background: #6c757d; }
+
+
+/* Nouvelle grille et cartes */
+.analysis-grid-new {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.analysis-card-new {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 1.5rem;
+    border-top: 4px solid #007bff;
+    display: flex;
+    flex-direction: column;
+}
+
+.analysis-card-new .card-title {
+    font-weight: bold;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #343a40;
+    font-size: 1.1rem;
+}
+.analysis-card-new .card-content {
+    flex-grow: 1;
+}
+
+/* Style spécifique pour la carte Heuristique */
+.heuristic-details-list {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+}
+.heuristic-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.3rem 0;
+}
+.heuristic-item.positive { color: #28a745; }
+.heuristic-item.negative { color: #dc3545; }
+
+/* Style pour la barre de progression (Analyse URL) */
+.progress-bar-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: #6c757d;
+    margin-bottom: 0.25rem;
+}
+.progress-bar-container {
+    width: 100%;
+    background-color: #e9ecef;
+    border-radius: 5px;
+    height: 1.2rem;
+}
+.progress-bar {
+    height: 100%;
+    border-radius: 5px;
+    background: linear-gradient(90deg, #dc3545, #ffc107, #28a745);
+    transition: width 0.5s ease-in-out;
+}
+.prediction-text {
+    text-align: center;
+    margin-top: 0.75rem;
+    font-weight: 500;
+}
+
+/* Style pour la carte LLM */
+.score-badge {
+    background-color: #007bff;
+    color: white;
+    padding: 0.2rem 0.6rem;
+    border-radius: 15px;
+    font-size: 1rem;
+    font-weight: bold;
+    display: inline-block;
+    margin-bottom: 1rem;
+}
+.reason-quote {
+    background: #e9ecef;
+    border-left: 4px solid #007bff;
+    padding: 1rem;
+    margin: 0;
+    font-style: italic;
+    color: #495057;
+    border-radius: 0 5px 5px 0;
+}
+
+/* Style pour la carte OSINT */
+.fact-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+.fact-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+.fact-item span:first-child {
+    font-size: 1.2rem;
+}
+.fact-item-label {
+    font-weight: 500;
+    color: #495057;
+}
+.fact-item-value {
+    color: #6c757d;
+}
+
+/* Ajustement pour écrans plus petits */
+@media (max-width: 992px) {
+    .analysis-grid-new {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* On retire l'ancienne grille pour éviter les conflits */
+.analysis-grid {
+    display: none;
+}
+
+
+/* Style pour les indicateurs heuristiques traduits */
+.heuristic-item {
+    justify-content: space-between; /* Aligne le texte à gauche et la pastille à droite */
+    padding: 0.4rem 0;
+}
+
+.heuristic-item-text {
+    flex-grow: 1;
+}
+
+.score-pill {
+    padding: 0.2rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: white;
+    margin-left: 1rem;
+    flex-shrink: 0; /* Empêche la pastille de se réduire */
+}
+
+.score-pill.positive {
+    background-color: #28a745;
+}
+
+.score-pill.negative {
+    background-color: #dc3545;
+}
+
+/* Styles pour la jauge de score heuristique */
+.gauge-container {
+    position: relative;
+    padding: 0.5rem 0;
+    margin-bottom: 1rem;
+}
+
+.gauge-bar {
+    height: 20px;
+    background: linear-gradient(to right, #dc3545, #ffc107 45% 55%, #28a745);
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    font-size: 0.75rem;
+    font-weight: bold;
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+}
+
+.gauge-marker {
+    position: absolute;
+    bottom: -5px;
+    transform: translateX(-50%); /* Centre le marqueur sur sa position */
+    width: 40px;
+    height: 40px;
+    background: #6c757d; /* Couleur par défaut */
+    border: 3px solid white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    transition: left 0.5s ease-out, background-color 0.5s;
+    z-index: 2;
+}
+
+.marker-value {
+    color: white;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+
+/* Styles pour l'état vide d'une carte d'analyse */
+.empty-state-container {
+    display: flex; /* Sera activé par JS */
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    height: 100%;
+    padding: 1rem;
+    color: #6c757d;
+}
+
+.empty-state-icon {
+    font-size: 3rem;
+    line-height: 1;
+    margin-bottom: 1rem;
+    color: #28a745;
+}
+
+.empty-state-title {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #343a40;
+    margin-bottom: 0.25rem;
+}
+
+.empty-state-subtitle {
+    font-size: 0.9rem;
+}
