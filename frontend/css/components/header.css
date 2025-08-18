@@ -1,0 +1,52 @@
+.header {
+  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+  color: #fff;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+.logo { display: flex; align-items: center; gap: 0.75rem; }
+.shield-icon { width: 40px; height: 40px; background: linear-gradient(45deg, var(--primary-color), var(--primary-color-dark)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+.logo-text { display: flex; flex-direction: column; }
+.logo-title { font-family: 'Poppins', var(--font-family); font-size: 1.6rem; font-weight: 700; color: #fff; line-height: 1; }
+.logo-tagline { font-family: 'Poppins', var(--font-family); font-size: 0.75rem; color: #fff; opacity: 0.7; letter-spacing: 0.5px; }
+
+/* Menu utilisateur */
+.user-menu-wrapper { position: relative; }
+.user-menu-button { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; border-radius: var(--border-radius-md); background: transparent; border: none; color: #fff; cursor: pointer; transition: background-color 0.2s; }
+.user-menu-button:hover { background-color: rgba(255, 255, 255, 0.1); }
+.dropdown-menu { display: none; position: absolute; top: 120%; right: 0; background-color: var(--bg-card); border-radius: var(--border-radius-md); box-shadow: var(--shadow-md); width: 200px; z-index: 100; overflow: hidden; }
+.dropdown-menu.open { display: block; }
+.dropdown-item { display: block; padding: 0.75rem 1rem; color: var(--text-primary); text-decoration: none; font-size: 0.9rem; }
+.dropdown-item:hover { background-color: var(--bg-main); }
+.dropdown-item.logout { color: var(--risk-high-solid); }
+.dropdown-divider { height: 1px; background-color: var(--border-color); margin: 0.5rem 0; }
+
+/* Statistiques */
+.stats { display: flex; gap: 1rem; }
+.stat-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 1rem; background: rgba(255, 255, 255, 0.05); border-radius: var(--border-radius-md); border: 1px solid rgba(255, 255, 255, 0.1); transition: background-color 0.2s; }
+.stat-item:hover { background: rgba(255, 255, 255, 0.1); }
+.stat-icon-wrapper { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background-color: rgba(255, 255, 255, 0.1); }
+.stat-icon-wrapper svg { width: 18px; height: 18px; color: #fff; opacity: 0.8; }
+.stat-info { text-align: left; }
+.stat-number { font-size: 1.2rem; font-weight: 600; color: #fff; }
+.stat-label { font-size: 0.75rem; color: #fff; opacity: 0.7; }
+.stat-trend { font-size: 0.75rem; font-weight: 600; padding: 0.15rem 0.4rem; border-radius: 10px; margin-left: 0.5rem; }
+.stat-trend.positive { background-color: rgba(56, 161, 105, 0.3); color: var(--risk-low-solid); }
+.stat-trend.negative { background-color: rgba(229, 62, 62, 0.3); color: var(--risk-high-solid); }
+
+/* Barre d'outils */
+.toolbar { padding: 1rem 2rem; background: var(--bg-card); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+.search-wrapper { position: relative; display: flex; align-items: center; }
+.search-wrapper svg { position: absolute; left: 1rem; color: var(--text-secondary); width: 18px; height: 18px; }
+.search-input { padding: 0.75rem 1rem 0.75rem 3rem; border: 1px solid var(--border-color); border-radius: var(--border-radius-md); width: 350px; background-color: var(--bg-main); transition: all 0.2s; }
+.search-input:focus { background-color: var(--bg-card); border-color: var(--primary-color); outline: none; box-shadow: 0 0 0 2px var(--primary-color-light); }
+.toolbar-actions { display: flex; gap: 1rem; }
+.btn { padding: 0.6rem 1.2rem; border: none; border-radius: var(--border-radius-md); cursor: pointer; font-weight: 500; transition: all 0.2s; display: flex; align-items: center; gap: 0.5rem; }
+.btn svg { width: 16px; height: 16px; }
+.btn-primary { background: var(--primary-color); color: #fff; }
+.btn-primary:hover { background: var(--primary-color-dark); transform: translateY(-1px); }
+.btn-secondary { background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border-color); }
+.btn-secondary:hover { background: var(--bg-main); border-color: var(--text-secondary); }

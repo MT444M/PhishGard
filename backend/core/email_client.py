@@ -67,21 +67,34 @@ def get_emails(service, user_id='me', max_results=1, email_id=None):
             # Simplification: extraire les headers clés pour un accès facile
             from_header = next((h['value'] for h in headers if h['name'].lower() == 'from'), 'N/A')
             subject_header = next((h['value'] for h in headers if h['name'].lower() == 'subject'), 'N/A')
+            date_header = next((h['value'] for h in headers if h['name'].lower() == 'date'), 'N/A')
 
-            data, headers_part, _ = _find_best_text_part(payload)
-            body = _decode_email_body(data, headers_part) if data else ""
+            plain_part, html_part = _find_text_parts(payload)
+            
+            body = ""
+            if plain_part:
+                body = _decode_email_body(plain_part[0], plain_part[1])
+
+            html_body = ""
+            if html_part:
+                html_body = _decode_email_body(html_part[0], html_part[1])
             
             email_data = {
                 'id': msg.get('id'),
                 'snippet': msg.get('snippet'),
                 'sender': from_header,
                 'subject': subject_header,
+                'timestamp': date_header,
                 'body': body,
+                'html_body': html_body,
                 'full_headers': headers
             }
             email_list.append(email_data)
         
         print(f"{len(email_list)} e-mail(s) récupéré(s).")
+
+        # debug
+        # print("Exemple d'e-mail récupéré:", email_list[0] if email_list else "Aucun e-mail trouvé.")
         return email_list
 
     except HttpError as error:
@@ -109,28 +122,27 @@ def _decode_email_body(data_b64url, headers_list):
         return base64.urlsafe_b64decode(data_b64url.encode('ASCII')).decode('latin-1', errors='replace')
 
 
-def _find_best_text_part(payload):
-    """Trouve récursivement la meilleure partie textuelle (plain > html)."""
+def _find_text_parts(payload):
+    """Trouve récursivement les parties textuelles (plain et html)."""
     mime_type = payload.get('mimeType', '').lower()
+    
     if mime_type == 'text/plain':
         if payload.get('body') and 'data' in payload['body']:
-            return payload['body']['data'], payload.get('headers', []), 'text/plain'
+            return (payload['body']['data'], payload.get('headers', [])), None
     
-    if mime_type.startswith('multipart/'):
-        parts = payload.get('parts', [])
-        candidate_plain = None
-        candidate_html = None
-        for part in parts:
-            data, headers, found_mime = _find_best_text_part(part)
-            if data and found_mime == 'text/plain':
-                candidate_plain = (data, headers, 'text/plain')
-                break
-            if data and found_mime == 'text/html' and not candidate_html:
-                candidate_html = (data, headers, 'text/html')
-        return candidate_plain if candidate_plain else candidate_html
-
     if mime_type == 'text/html':
         if payload.get('body') and 'data' in payload['body']:
-            return payload['body']['data'], payload.get('headers', []), 'text/html'
+            return None, (payload['body']['data'], payload.get('headers', []))
 
-    return None, None, None
+    if mime_type.startswith('multipart/'):
+        plain_part = None
+        html_part = None
+        for part in payload.get('parts', []):
+            plain, html = _find_text_parts(part)
+            if plain and not plain_part:
+                plain_part = plain
+            if html and not html_part:
+                html_part = html
+        return plain_part, html_part
+
+    return None, None

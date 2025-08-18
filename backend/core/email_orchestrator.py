@@ -75,7 +75,18 @@ class EmailOrchestrator:
             print(f"      ... Analyse de la première URL trouvée : {first_url}")
             url_orchestrator = URLOrchestrator(first_url)
             url_orchestrator.collect_all_features()
-            url_model_results = url_orchestrator.get_prediction()
+            prediction_data = url_orchestrator.get_prediction()
+            url_model_results = {
+                "prediction": prediction_data.get("prediction"),
+                "probability_phishing": prediction_data.get("probability_phishing"),
+                "probability_legitimate": prediction_data.get("probability_legitimate"),
+                "details": [{
+                    "url": first_url,
+                    "verdict": prediction_data.get("prediction"),
+                    "probability_phishing": prediction_data.get("probability_phishing"),
+                    "probability_legitimate": prediction_data.get("probability_legitimate")
+                }]
+            }
         else:
             print("      ... Aucune URL trouvée à analyser.")
         # ========================================================

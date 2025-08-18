@@ -1,0 +1,31 @@
+/* css/base/variables.css */
+
+:root {
+  /* Couleurs principales */
+  --primary-color: #3b82f6; /* Un bleu plus moderne */
+  --primary-color-dark: #2563eb;
+  --primary-color-light: rgba(59, 130, 246, 0.1);
+
+  /* Couleurs de fond et de texte */
+  --bg-main: #f4f7fa; /* Un gris encore plus clair */
+  --bg-card: #ffffff;
+  --bg-section: #f9fafb; /* Fond pour les sections internes */
+  --text-primary: #111827;
+  --text-secondary: #6b7280;
+  --text-tertiary: #9ca3af;
+  --border-color: #e5e7eb;
+
+  /* Couleurs sémantiques */
+  --risk-high-solid: #ef4444;   /* Rouge */
+  --risk-medium-solid: #f59e0b; /* Ambre */
+  --risk-low-solid: #10b981;    /* Vert émeraude */
+
+  /* Typographie */
+  --font-family: 'Segoe UI', system-ui, sans-serif;
+
+  /* Rayons et ombres */
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}

@@ -89,7 +89,9 @@ def get_email_list():
                 "sender": email.get('sender'),
                 "subject": email.get('subject'),
                 "preview": email.get('snippet', ''), # Le snippet de l'API Gmail est parfait pour l'aperçu
-                "timestamp": "N/A" # L'API Gmail fournit une date plus complexe à parser, on la laisse de côté pour l'instant
+                "body": email.get('body', ''),  # Le corps de l'email
+                "html_body": email.get('html_body', ''),  # Le corps HTML de l'email
+                "timestamp": email.get('timestamp', ''),  # Le timestamp de l'email
             })
         return formatted_emails
         

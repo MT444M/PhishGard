@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr">
-    
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,198 +9,259 @@
 </head>
 
 <body>
+    <!-- Contenu de la page -->
     <div class="container">
-        <!-- Header -->
         <div class="header">
+
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>PhishGard</title>
+                
+                <link rel="preconnect" href="https://fonts.googleapis.com">
+                <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+                <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+                
+                <link rel="stylesheet" href="css/style.css">
+            </head>
+
             <div class="logo">
                 <div class="shield-icon">🛡️</div>
-                PhishGard
-            </div>
-            <div class="user-info">
-                <div class="stats">
-                    <div class="stat-item">
-                        <div class="stat-number">1,247</div>
-                        <div>Emails analysés</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number">89</div>
-                        <div>Phishing détectés</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number">99.2%</div>
-                        <div>Précision</div>
-                    </div>
-                </div>
-                <div>👤 admin@company.com</div>
-            </div>
-        </div>
-        
-        <!-- Main Content -->
-        <div class="main-content">
-            <!-- Sidebar -->
-            <div class="sidebar">
-                <div class="filter-section">
-                    <div class="filter-title">Statut</div>
-                    <div class="filter-item active">
-                        <span>📧 Tous les emails</span>
-                        <span class="badge">1247</span>
-                    </div>
-                    <div class="filter-item phishing">
-                        <span>⚠️ Phishing</span>
-                        <span class="badge">89</span>
-                    </div>
-                    <div class="filter-item suspicious">
-                        <span>🔍 Suspects</span>
-                        <span class="badge">156</span>
-                    </div>
-                    <div class="filter-item legitimate">
-                        <span>✅ Légitimes</span>
-                        <span class="badge">1002</span>
-                    </div>
-                </div>
-                
-                <div class="filter-section">
-                    <div class="filter-title">Catégories</div>
-                    <div class="filter-item">
-                        <span>💼 Professionnel</span>
-                        <span class="badge">567</span>
-                    </div>
-                    <div class="filter-item">
-                        <span>🛒 E-commerce</span>
-                        <span class="badge">234</span>
-                    </div>
-                    <div class="filter-item">
-                        <span>🏦 Banque</span>
-                        <span class="badge">123</span>
-                    </div>
-                    <div class="filter-item">
-                        <span>📰 Newsletter</span>
-                        <span class="badge">189</span>
-                    </div>
-                </div>
-                
-                <div class="filter-section">
-                    <div class="filter-title">Période</div>
-                    <div class="filter-item">
-                        <span>📅 Aujourd'hui</span>
-                        <span class="badge">47</span>
-                    </div>
-                    <div class="filter-item">
-                        <span>📅 Cette semaine</span>
-                        <span class="badge">312</span>
-                    </div>
-                    <div class="filter-item">
-                        <span>📅 Ce mois</span>
-                        <span class="badge">1247</span>
-                    </div>
+                <div class="logo-text">
+                    <span class="logo-title">PhishGard</span>
+                    <small class="logo-tagline">Analyse & Protection IA</small>
                 </div>
             </div>
             
-            <!-- Main Panel -->
-            <div class="main-panel">
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-icon-wrapper">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-number">1,247</div>
+                        <div class="stat-label">Emails analysés</div>
+                    </div>
+                    <div class="stat-trend positive">▲ +5%</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon-wrapper">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-number">89</div>
+                        <div class="stat-label">Phishing détectés</div>
+                    </div>
+                    <div class="stat-trend negative">▼ -2%</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon-wrapper">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-number">99.2%</div>
+                        <div class="stat-label">Précision</div>
+                    </div>
+                </div>
+            </div>
+            <div class="user-menu-wrapper">
+                <button class="user-menu-button" id="user-menu-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    <span>admin@company.com</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+                <div class="dropdown-menu" id="user-dropdown-menu">
+                    <a href="#" class="dropdown-item">Mon Compte</a>
+                    <a href="#/settings" class="dropdown-item">Paramètres</a>
+                    <div class="dropdown-divider"></div>
+                    <a href="#" class="dropdown-item logout">Déconnexion</a>
+                </div>
+            </div>
+        </div>
+
+
+        
+         <div class="main-content">
+            <!-- Barre de navigation principale -->
+            <nav class="main-nav">
+                <a href="#/inbox" class="nav-item active">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-6l-2 3h-4l-2-3H2"></path><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg>
+                    <span>Boîte de réception</span>
+                </a>
+                <a href="#/analyzer" class="nav-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <span>Analyse à la demande</span>
+                </a>
+                <a href="#/dashboard" class="nav-item">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                    <span>Tableau de bord</span>
+                </a>
+                <a href="#/news" class="nav-item">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg>
+                    <span>Fil d'actualité</span>
+                </a>
+
+                <div class="nav-footer">
+                    <a href="#/settings" class="nav-item">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                        <span>Paramètres</span>
+                    </a>
+                </div>
+
+
+            </nav>
+
+            <!-- Contenu principal --> 
+            <main id="app-view" class="main-panel">
                 <div class="toolbar">
                     <div class="search-bar">
                         <input type="text" class="search-input" placeholder="Rechercher dans les emails...">
-                        <button class="btn btn-primary">🔍 Rechercher</button>
+                        <button class="btn btn-primary"></button>
                     </div>
                     <div>
-                        <button class="btn btn-secondary">📊 Exporter</button>
-                        <button class="btn btn-primary">⚙️ Paramètres</button>
+                        <button class="btn btn-secondary"></button>
                     </div>
                 </div>
-                <!-- Email List -->
-                <div class="email-list" id="email-list-container"> </div>
+                <div class="email-list" id="email-list-container">
+                </div>
+            </main>
+
+            <aside id="contextual-sidebar" class="contextual-sidebar">
                 
-            </div>
-        </div>
+                <div class="filter-section">
+                    <div class="filter-title">Statut</div>
+                    <div class="status-filters-grid">
+                        <div class="status-card active" data-filter="all">
+                            <div class="status-card-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                            </div>
+                            <div class="status-card-info">
+                                <span class="status-card-label">Tous les emails</span>
+                                <span class="status-card-count" id="count-all">1247</span>
+                            </div>
+                        </div>
+                        <div class="status-card" data-filter="phishing">
+                            <div class="status-card-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 10c0-2.3-1.2-4.3-3-5.5-1.3-1-3-1.5-4.8-1.5-2.8 0-5.3.9-7.2 2.5-1.3 1-2.2 2.3-2.5 3.8-.2 1-.3 2.1-.3 3.2 0 1.9.4 3.7 1.2 5.2s1.9 2.7 3.3 3.7c1.4 1 3.1 1.5 5 1.5 2.1 0 4.1-.7 5.7-2.1 1.6-1.4 2.6-3.3 2.8-5.4.2-1.7.2-3.5 0-5.2z"></path><path d="M10 16s.5-3 2-3c1.5 0 2 3 2 3"></path><line x1="14" y1="12" x2="14.01" y2="12"></line><line x1="10" y1="12" x2="10.01" y2="12"></line></svg>
+                            </div>
+                            <div class="status-card-info">
+                                <span class="status-card-label">Phishing</span>
+                                <span class="status-card-count" id="count-phishing">89</span>
+                            </div>
+                        </div>
+                        <div class="status-card" data-filter="suspicious">
+                            <div class="status-card-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                            </div>
+                            <div class="status-card-info">
+                                <span class="status-card-label">Suspects</span>
+                                <span class="status-card-count" id="count-suspicious">156</span>
+                            </div>
+                        </div>
+                        <div class="status-card" data-filter="legitimate">
+                            <div class="status-card-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                            </div>
+                            <div class="status-card-info">
+                                <span class="status-card-label">Légitimes</span>
+                                <span class="status-card-count" id="count-legitimate">1002</span>
+                            </div>
+                        </div>
+                    </div>
+
+                <div class="filter-section"> </div> <!-- Espace pour les filtres supplémentaires -->
+
+                <div class="filter-section">       
+                    <div class="filter-title">Catégories</div>
+                    <div class="filter-item">
+                        <span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                            Professionnel
+                        </span>
+                        <span class="badge">567</span>
+                    </div>
+                    <div class="filter-item">
+                        <span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                            E-commerce
+                        </span>
+                        <span class="badge">234</span>
+                    </div>
+                </div>
+
+                <div class="filter-section">
+                    <div class="filter-title">Période</div>
+                    <div class="filter-item">
+                        <span>
+                           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                            Aujourd'hui
+                        </span>
+                        <span class="badge">47</span>
+                    </div>
+                    <div class="filter-item">
+                        <span>
+                           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                            Cette semaine
+                        </span>
+                        <span class="badge">312</span>
+                    </div>
+                    </div>
+                </div>
+            </aside>
     </div>
+        
 
-   
-
-    <!-- Modal -->
-    <div class="modal" id="emailModal">
+    <!-- Modals -->
+    <div id="emailModal" class="modal" style="display: none;">
         <div class="modal-content">
-            <div id="modal-verdict-banner" class="modal-verdict-banner">
-                <span id="verdict-icon" class="verdict-icon"></span>
-                <div>
-                    <div id="verdict-text" class="verdict-text">Analyse en cours...</div>
-                    <div id="verdict-confidence" class="verdict-confidence"></div>
-                </div>
-                <span class="close" onclick="closeModal()">&times;</span>
+        <div id="modal-verdict-banner" class="modal-verdict-banner verdict-pending"></div>
+    
+        <div class="modal-body">
+            <div class="modal-tabs">
+            <button class="modal-tab-button active" data-tab="tab-summary">Synthèse</button>
+            <button class="modal-tab-button" data-tab="tab-details">Analyse Détaillée</button>
+            <button class="modal-tab-button" data-tab="tab-preview">Aperçu de l'Email</button>
             </div>
     
-            <div class="modal-body">
-                <div class="analysis-grid-new">
-                    <div class="analysis-card-new">
-                        <div class="card-title">📧 Vérifications Techniques</div>
-                        <div class="card-content">
-                            <div class="gauge-container">
-                                <div class="gauge-bar">
-                                    <div class="gauge-zone" style="color: #c82333;">Phishing</div>
-                                    <div class="gauge-zone" style="color: #e0a800;">Suspect</div>
-                                    <div class="gauge-zone" style="color: #218838;">Légitime</div>
-                                </div>
-                                <div id="heuristic-gauge-marker" class="gauge-marker">
-                                    <div id="heuristic-marker-value" class="marker-value">--</div>
-                                </div>
-                            </div>
-                            <div id="heuristic-details" class="heuristic-details-list">
-                                </div>
-                        </div>
-                    </div>
-    
-                    <div class="analysis-card-new">
-                        <div class="card-title">🔗 Analyse des Liens (IA)</div>
-                        <div class="card-content">
-                            <div id="url-analysis-view">
-                                <div class="progress-bar-label">
-                                    <span>Phishing</span>
-                                    <span>Légitime</span>
-                                </div>
-                                <div class="progress-bar-container">
-                                    <div id="url-progress-bar" class="progress-bar"></div>
-                                </div>
-                                <div id="url-prediction" class="prediction-text">En attente...</div>
-                            </div>
-                    
-                            <div id="url-empty-state" class="empty-state-container" style="display: none;">
-                                <div class="empty-state-icon">✅</div>
-                                <div class="empty-state-title">Aucun lien détecté</div>
-                                <div class="empty-state-subtitle">
-                                    C'est souvent un signe positif. Les e-mails de phishing contiennent presque toujours des liens.
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-    
-                    <div class="analysis-card-new">
-                        <div class="card-title">🤖 Analyse du Contenu (IA)</div>
-                        <div class="card-content">
-                             <div id="llm-score" class="score-badge">--/10</div>
-                            <blockquote id="llm-reason" class="reason-quote">
-                                En attente de l'analyse du contenu...
-                            </blockquote>
-                        </div>
-                    </div>
-    
-                    <div class="analysis-card-new">
-                        <div class="card-title">🔍 Réputation de l'Expéditeur</div>
-                        <div id="osint-details" class="fact-list">
-                            </div>
-                    </div>
+            <div class="modal-tab-content-wrapper">
+            <div class="tab-pane active" id="tab-summary">
+                <div class="summary-verdict-block"></div>
+                <div class="summary-factors-block">
+                <h5 class="block-title">Facteurs Clés de Décision</h5>
+                <ul id="summary-factors-list"></ul>
                 </div>
-    
-                 <div class="email-content">
-                    <h4>📧 Contenu de l'email (Prévisualisation)</h4>
-                    <div class="email-body" id="email-body-content">
-                        Le contenu de l'email s'affichera ici...
-                    </div>
+                <div class="summary-ai-block" style="display: none;">
+                <p id="summary-ai-text">...</p>
                 </div>
             </div>
+    
+            <div class="tab-pane" id="tab-details">
+                <details class="report-section" open>
+                <summary class="report-section-summary"><svg></svg>Origine & Réputation de l'Expéditeur</summary>
+                <div class="report-section-content" id="details-origin-content"></div>
+                </details>
+                <details class="report-section">
+                <summary class="report-section-summary"><svg></svg>Contenu & Intention (Analyse IA)</summary>
+                <div class="report-section-content" id="details-content-content"></div>
+                </details>
+                <details class="report-section">
+                <summary class="report-section-summary"><svg></svg>Vérifications Techniques de l'Entête</summary>
+                <div class="report-section-content" id="details-tech-content"></div>
+                </details>
+            </div>
+    
+            <div class="tab-pane" id="tab-preview">
+                <div id="email-preview-container">
+                <div class="email-preview-header"><svg></svg>Aperçu de l'Email</div>
+                <div class="email-preview-content"></div>
+                </div>
+            </div>
+            </div>
+        </div>
         </div>
     </div>
 
-    <script src="js/app.js"></script>
+    <script src="js/main.js" type="module"></script>
 
 </body>
 </html>
