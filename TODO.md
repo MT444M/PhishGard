@@ -2,11 +2,11 @@
 
 Liste des tâches à faire :
 
-1. Améliorer la présentation de l'analyse détaillée
-2. Ajouter dans l'analyse détaillée le nombre de liens analysés avec leurs détails d'analyse
-3. revoir la récupération du time et l'affichage
-4. développer le module analyse des liens
-5. détailler les json final_report 
+1. Améliorer la présentation de l'analyse détaillée. DONE
+2. Ajouter dans l'analyse détaillée le nombre de liens analysés avec leurs détails d'analyse. DONE
+3. revoir la récupération du time et l'affichage. DONE
+4. développer le module analyse des liens. DONE
+5. détailler les json final_report  
     * "llm_analysis": {
       "classification": "SUSPICIOUS",
       "reason": "L'email contient des liens suspects, des offres trop belles...",
@@ -20,12 +20,16 @@ Liste des tâches à faire :
         { "url": "http://exemple-securise.com", "verdict": "legitimate", "score": 0.95 },
         { "url": "http://lien-suspect.net", "verdict": "suspicious", "score": 0.85 }
       ]
-    }
-6. (?)
+    }. DONE
+6. (?). DONE
+                        //////////////////////////////////////////////////////////////////
+
+7. ajouter onglets "Web Technologies" et "Reputation"
 
 
 
 // python -m http.server 8080
+# remove WebsitePhishingDetection from Github
 
 
 --- Analyse complète terminée. ---

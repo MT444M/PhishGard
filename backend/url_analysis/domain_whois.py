@@ -57,6 +57,22 @@ def get_ip_addresses(domain: str) -> dict:
     return {"IPAddresses": ips}
 
 
+def get_asn_info(ip: str) -> dict:
+    """
+    Retrieves ASN and organization information for a given IP address using ipinfo.io.
+    """
+    try:
+        response = requests.get(f"https://ipinfo.io/{ip}/json")
+        data = response.json()
+        return {
+            "ASN": data.get("org"),
+            "Country": data.get("country"),
+            "City": data.get("city"),
+        }
+    except Exception as e:
+        return {"error": str(e)}
+
+
 def format_domain_age(age_days: int) -> str:
     """
     Converts domain age in days to a human-readable format: years, months, days.
@@ -166,9 +182,10 @@ def get_passive_dns(domain: str) -> dict:
 
 
 if __name__ == "__main__":
-    # Example usage
+    import json
+    # # Example usage
     test_url = "https://github.com/"
-    print("Test URL:", test_url)
+    # print("Test URL:", test_url)
 
     dom = parse_domain(test_url)
     print("Parsed Domain:", dom)
@@ -178,7 +195,11 @@ if __name__ == "__main__":
     print("IP Addresses:", ip_info)
 
     whois_info = get_whois_info(dom["Domain"])
-    print("WHOIS Info:", whois_info)
+    print("WHOIS Info:", json.dumps(whois_info, indent=2))
 
-    dns_info = get_passive_dns(dom["Domain"])
-    print("Passive DNS A records:", dns_info)
+    # dns_info = get_passive_dns(dom["Domain"])
+    # print("Passive DNS A records:", dns_info)
+
+    # if ip_info.get("IPAddresses"):
+    #     asn_info = get_asn_info(ip_info["IPAddresses"][0])
+    #     print("ASN Info:", json.dumps(asn_info, indent=2))

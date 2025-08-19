@@ -141,6 +141,38 @@ def analyze_email(request: EmailAnalyzeRequest):
         # Pour le débuggage, il est utile d'imprimer l'erreur côté serveur
         print(f"Erreur lors de l'analyse de l'email: {e}")
         raise HTTPException(status_code=500, detail=f"Une erreur interne est survenue: {e}")
+    
+
+# --- NOUVEAUX Endpoints pour les URLs ---
+
+@app.post("/api/url/context")
+def get_url_contextual_analysis(request: URLAnalyzeRequest):
+    """
+    Endpoint pour l'analyse 'humaine'.
+    Récupère des informations contextuelles détaillées sur une URL (WHOIS, DNS, SSL...).
+    """
+    try:
+        orchestrator = URLOrchestrator(request.url)
+        analysis_result = orchestrator.run_contextual_analysis()
+        return analysis_result
+    except Exception as e:
+        print(f"Erreur lors de l'analyse contextuelle de l'URL: {e}")
+        raise HTTPException(status_code=500, detail=f"Une erreur interne est survenue: {str(e)}")
+
+@app.post("/api/url/predict")
+def get_url_prediction(request: URLAnalyzeRequest):
+    """
+    Endpoint pour la prédiction 'machine'.
+    Analyse une URL et renvoie le verdict du modèle de Machine Learning.
+    """
+    try:
+        orchestrator = URLOrchestrator(request.url)
+        prediction_result = orchestrator.run_prediction()
+        return prediction_result
+    except Exception as e:
+        print(f"Erreur lors de la prédiction pour l'URL: {e}")
+        raise HTTPException(status_code=500, detail=f"Une erreur interne est survenue: {str(e)}")
+
 
 
 # ==============================================================================

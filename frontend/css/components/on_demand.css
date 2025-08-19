@@ -1,0 +1,616 @@
+/* --- NOUVEAU : Styles pour l'onglet SSL & Hosting --- */
+
+.detail-label svg {
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;
+    margin-right: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.status-valid {
+    color: var(--risk-low-solid);
+    font-weight: 600;
+}
+.status-invalid {
+    color: var(--risk-high-solid);
+    font-weight: 600;
+}
+
+.highlight-box {
+    margin-top: 1.5rem;
+    padding: 1rem 1.5rem;
+    background-color: var(--bg-card); /* Ou var(--primary-color-light) pour plus de couleur */
+    border-radius: var(--border-radius-md);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.highlight-value {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+/* css/components/on-demand.css */
+.on-demand-container {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-lg);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.on-demand-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border-color);
+    padding: 0.5rem 1.5rem 0 1.5rem;
+    flex-shrink: 0;
+}
+
+.on-demand-tab-button {
+    padding: 0.75rem 1.25rem;
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s ease-in-out;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.on-demand-tab-button:hover {
+    color: var(--text-primary);
+}
+.on-demand-tab-button.active {
+    color: var(--primary-color);
+    font-weight: 600;
+    border-bottom-color: var(--primary-color);
+}
+.on-demand-tab-button svg {
+    width: 16px;
+    height: 16px;
+    stroke-width: 2.5px;
+}
+
+.on-demand-content {
+    padding: 2rem;
+    overflow-y: auto;
+    flex-grow: 1;
+}
+
+.on-demand-pane {
+    display: none;
+}
+
+.on-demand-pane.active {
+    display: block;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+/* css/components/on-demand.css */
+
+/* --- AJOUT : Styles pour le formulaire d'analyse d'URL --- */
+
+.url-analyzer-form {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.input-group {
+    flex-grow: 1; /* Permet au champ de saisie de prendre toute la largeur disponible */
+    position: relative;
+}
+
+.input-group svg {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-secondary);
+    width: 20px;
+    height: 20px;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 0.8rem 1rem 0.8rem 3rem; /* Espace à gauche pour l'icône */
+    font-size: 1rem;
+    border-radius: var(--border-radius-md);
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    box-sizing: border-box; /* Assure que le padding n'affecte pas la largeur totale */
+}
+
+#analyze-url-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.8rem 1.5rem;
+    flex-shrink: 0; /* Empêche le bouton de rétrécir si l'espace manque */
+}
+
+/* --- NOUVEAU : Styles pour les résultats d'analyse --- */
+
+.analysis-section {
+    margin-top: 2rem;
+}
+
+
+/* --- MODIFIÉ : Style amélioré pour les titres de section --- */
+
+.analysis-section h2 {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em; /* Augmente l'espacement pour un look plus "design" */
+    color: var(--text-secondary);
+    margin: 3rem 0 2rem 0; /* Augmente l'espace vertical autour des titres */
+}
+
+/* Ligne décorative AVANT le texte */
+.analysis-section h2::before {
+    content: '';
+    flex-grow: 1; /* Fait en sorte que la ligne prenne tout l'espace disponible */
+    height: 1px;
+    background-color: var(--border-color);
+    margin-right: 1.5rem; /* Espace entre la ligne et le texte */
+}
+
+/* Ligne décorative APRÈS le texte */
+.analysis-section h2::after {
+    content: '';
+    flex-grow: 1; /* Fait en sorte que la ligne prenne tout l'espace disponible */
+    height: 1px;
+    background-color: var(--border-color);
+    margin-left: 1.5rem; /* Espace entre le texte et la ligne */
+}
+
+
+
+/* --- MODIFIÉ : Styles pour le bandeau de résumé (plus compact) --- */
+
+.overview-strip {
+    display: flex;
+    justify-content: space-between; /* Aligne les éléments avec un espacement régulier */
+    background-color: var(--bg-main);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-lg);
+    padding: 0.75rem 1rem; /* Padding réduit */
+    width: 100%;
+}
+
+.overview-stat {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem; /* Espace réduit entre icône et texte */
+    padding: 0 1rem; /* Espace horizontal entre chaque stat */
+    border-right: 1px solid var(--border-color);
+}
+
+.overview-stat:last-child {
+    border-right: none;
+    padding-right: 0;
+}
+.overview-stat:first-child {
+    padding-left: 0;
+}
+
+.overview-stat-icon svg {
+    width: 24px; /* Taille d'icône légèrement réduite */
+    height: 24px;
+    color: var(--primary-color);
+}
+
+.overview-stat-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.overview-stat-label {
+    font-size: 0.75rem; /* Police du libellé réduite */
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.overview-stat-value {
+    font-size: 0.9rem; /* Police de la valeur réduite */
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* États de chargement et d'erreur */
+.loader {
+    width: 48px;
+    height: 48px;
+    border: 3px solid var(--border-color);
+    border-bottom-color: var(--primary-color);
+    border-radius: 50%;
+    display: inline-block;
+    box-sizing: border-box;
+    animation: rotation 1s linear infinite;
+    margin: 1rem auto;
+}
+
+.loading-text {
+    text-align: center;
+    color: var(--text-secondary);
+}
+
+.error-message {
+    text-align: center;
+    color: var(--risk-high-solid);
+    background-color: rgba(239, 68, 68, 0.1);
+    padding: 1rem;
+    border-radius: var(--border-radius-md);
+}
+
+@keyframes rotation {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+
+/* css/components/on-demand.css */
+
+/* --- NOUVEAU : Styles pour les onglets de détails --- */
+
+.details-tabs-container {
+    margin-top: 2rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-md);
+    background-color: var(--bg-main);
+}
+
+.details-tab-nav {
+    display: flex;
+    border-bottom: 1px solid var(--border-color);
+    background-color: var(--bg-card);
+    padding: 0 0.5rem;
+    border-radius: var(--border-radius-md) var(--border-radius-md) 0 0;
+}
+
+.details-tab-button {
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s ease-in-out;
+}
+.details-tab-button:hover {
+    color: var(--text-primary);
+    background-color: var(--bg-main);
+}
+.details-tab-button.active {
+    color: var(--primary-color);
+    font-weight: 600;
+    border-bottom-color: var(--primary-color);
+}
+
+.details-tab-content {
+    padding: 1.5rem;
+}
+
+.details-tab-pane {
+    display: none;
+    animation: fadeIn 0.3s;
+}
+.details-tab-pane.active {
+    display: block;
+}
+
+/* Style pour les listes de détails (WHOIS, DNS, etc.) */
+
+/* NOUVEAU : Titre à l'intérieur d'un panneau d'onglet */
+.details-section-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+}
+
+/* MODIFIÉ : Style pour les listes de détails (WHOIS, DNS, etc.) */
+.detail-item {
+    display: grid;
+    /* Colonne des libellés plus large pour le confort de lecture */
+    grid-template-columns: 250px 1fr; 
+    gap: 1.5rem; /* Espace augmenté */
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 0.9rem;
+    align-items: center;
+}
+.detail-item:first-of-type {
+    padding-top: 0;
+}
+.detail-item:last-of-type {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.detail-label {
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.detail-value {
+    font-weight: 500;
+    color: var(--text-primary);
+    word-break: break-all;
+    line-height: 1.5; /* Meilleure lisibilité pour les listes (ex: Name Servers) */
+}
+
+/* css/components/on-demand.css */
+
+/* --- NOUVEAU : Styles pour l'onglet DNS --- */
+
+.dns-summary-line {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.dns-summary-line svg {
+    width: 16px;
+    height: 16px;
+}
+
+.dns-records-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+}
+
+.dns-record-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background-color: var(--bg-card);
+    border-radius: var(--border-radius-md);
+    border: 1px solid var(--border-color);
+}
+
+.dns-record-label {
+    font-weight: 500;
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.dns-record-label svg {
+    width: 18px;
+    height: 18px;
+}
+
+.dns-record-values {
+    display: flex;
+    gap: 1.5rem;
+    font-family: monospace;
+    font-size: 0.9rem;
+}
+
+.ttl-stats-container {
+    background-color: var(--bg-card);
+    border-radius: var(--border-radius-md);
+    padding: 1rem;
+}
+
+.details-subsection-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.details-subsection-title svg {
+    width: 16px;
+    height: 16px;
+}
+
+.ttl-stat-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    padding: 0.5rem 0;
+    color: var(--text-secondary);
+}
+.ttl-stat-item strong {
+    color: var(--text-primary);
+}
+
+
+/* --- NOUVEAU : Styles pour l'onglet Server Location --- */
+
+.location-grid {
+    display: grid;
+    /* Crée 2 colonnes sur les grands écrans, et 1 seule sur les plus petits */
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+}
+
+.location-card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-md);
+    padding: 1.25rem;
+}
+
+.location-label {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+}
+
+.location-label svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+
+.location-value {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    word-break: break-word; /* Important pour les longues valeurs */
+}
+
+/* css/components/on-demand.css */
+
+/* --- NOUVEAU : Styles pour l'onglet Content --- */
+
+.detail-item-full {
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--border-color);
+}
+.detail-item-full:last-of-type {
+    border-bottom: none;
+}
+
+.external-links-list {
+    list-style-type: '◦';
+    padding-left: 1.5rem;
+    margin-top: 0.75rem;
+    font-size: 0.9rem;
+}
+
+.external-links-list li {
+    margin-bottom: 0.5rem;
+    word-break: break-all;
+}
+
+.external-links-list a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+.external-links-list a:hover {
+    text-decoration: underline;
+}
+
+.metadata-list {
+    display: flex;
+    gap: 2rem;
+    margin-top: 0.75rem;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+}
+
+
+/* css/components/on-demand.css */
+
+/* --- NOUVEAU : Styles pour la carte de prédiction IA --- */
+
+.prediction-card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-lg);
+    padding: 1.5rem 2rem;
+    text-align: center;
+}
+
+.prediction-verdict {
+    padding: 1rem;
+    border-radius: var(--border-radius-md);
+    margin-bottom: 1.5rem;
+}
+.prediction-verdict h3 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.confidence-label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.confidence-bar-container {
+    width: 100%;
+    height: 12px;
+    background-color: var(--bg-main);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+}
+
+.confidence-bar-fill {
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.5s ease-in-out;
+}
+
+.probability-table {
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+.probability-table td {
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+}
+.probability-table td:first-child {
+    text-align: left;
+    font-weight: 500;
+}
+.probability-table td:last-child {
+    font-weight: 600;
+}
+
+/* Couleurs adaptatives */
+.prediction-card.verdict-phishing .prediction-verdict {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: var(--risk-high-solid);
+}
+.prediction-card.verdict-phishing .confidence-label {
+    color: var(--risk-high-solid);
+}
+.prediction-card.verdict-phishing .confidence-bar-fill {
+    background-color: var(--risk-high-solid);
+}
+.prediction-card.verdict-phishing .probability-table td:last-child {
+    color: var(--risk-high-solid);
+}
+
+.prediction-card.verdict-legitimate .prediction-verdict {
+    background-color: rgba(34, 197, 94, 0.1);
+    color: var(--risk-low-solid);
+}
+.prediction-card.verdict-legitimate .confidence-label {
+    color: var(--risk-low-solid);
+}
+.prediction-card.verdict-legitimate .confidence-bar-fill {
+    background-color: var(--risk-low-solid);
+}
+.prediction-card.verdict-legitimate .probability-table td:last-child {
+    color: var(--risk-low-solid);
+}
