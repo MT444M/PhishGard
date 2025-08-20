@@ -1,0 +1,21 @@
+.hidden-initially {
+    display: none;
+}
+
+.section-spacing {
+    margin-top: 2rem;
+}
+
+.loading-message-text {
+    padding: 1rem;
+    color: var(--text-secondary);
+    text-align: center;
+}
+
+.method-card-score-no-url {
+    opacity: 0.6;
+}
+
+.method-card-verdict-no-url {
+    text-transform: none;
+}

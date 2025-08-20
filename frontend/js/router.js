@@ -28,20 +28,15 @@ export function handleRouteChange() {
         sidebar.style.display = route.showSidebar ? 'block' : 'none';
     }
 
-    // 3. On cherche le conteneur de la vue actuelle, ou on le crée s'il n'existe pas
+    // 3. On cherche le conteneur de la vue actuelle
     let viewContainer = document.getElementById(route.viewId);
-    if (!viewContainer) {
-        viewContainer = document.createElement('div');
-        viewContainer.id = route.viewId;
-        viewContainer.classList.add('view-container');
-        appView.appendChild(viewContainer);
+    if (viewContainer) {
+        // 4. On affiche le conteneur de la vue actuelle
+        viewContainer.style.display = 'block';
+
+        // 5. On charge le contenu de la vue (la fonction vérifiera si c'est la première fois)
+        route.load(viewContainer);
     }
-
-    // 4. On affiche le conteneur de la vue actuelle
-    viewContainer.style.display = 'block';
-
-    // 5. On charge le contenu de la vue (la fonction vérifiera si c'est la première fois)
-    route.load(viewContainer);
 
     // 6. On met à jour le lien actif dans la navigation principale
     document.querySelectorAll('.main-nav .nav-item').forEach(item => {

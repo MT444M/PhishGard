@@ -614,3 +614,11 @@
 .prediction-card.verdict-legitimate .probability-table td:last-child {
     color: var(--risk-low-solid);
 }
+
+
+/* Ajout pour corriger le défilement de l'analyseur */
+#analyzer-view {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}

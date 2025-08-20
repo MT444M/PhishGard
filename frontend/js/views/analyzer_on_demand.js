@@ -1,3 +1,5 @@
+import { analyzeUrlContext, analyzeUrlPredict } from '../api.js';
+
 // js/views/analyzer_on_demand.js
 
 /**
@@ -310,7 +312,7 @@ function createSslTabContent(sslData) {
 
     // --- Partie 3 : Détails du chiffrement (données enrichies) ---
     const cipherDetailsHTML = `
-        <div class="details-section" style="margin-top: 2rem;">
+        <div class="details-section section-spacing">
             <h5 class="details-subsection-title">Cipher Details</h5>
             <div class="detail-item">
                 <span class="detail-label">Cipher Suite</span>
@@ -566,26 +568,10 @@ async function handleUrlAnalysis() {
 
     try {
         // 2. Lancer les deux appels API en parallèle pour gagner du temps
-        const contextPromise = fetch('http://127.0.0.1:8000/api/url/context', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ url: url })
-        });
-        const predictPromise = fetch('http://127.0.0.1:8000/api/url/predict', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ url: url })
-        });
-
-        // Attendre que les deux appels soient terminés
-        const [contextResponse, predictResponse] = await Promise.all([contextPromise, predictPromise]);
-
-        if (!contextResponse.ok || !predictResponse.ok) {
-            throw new Error('Une ou plusieurs requêtes API ont échoué.');
-        }
-
-        const contextData = await contextResponse.json();
-        const predictData = await predictResponse.json();
+        const [contextData, predictData] = await Promise.all([
+            analyzeUrlContext(url),
+            analyzeUrlPredict(url)
+        ]);
 
         // 3. Assembler la page de résultats complète
         const overviewHTML = createOverviewComponent(contextData.overview?.data);
@@ -609,7 +595,7 @@ async function handleUrlAnalysis() {
 
     } catch (error) {
         console.error("Erreur lors de l'analyse:", error);
-        resultsContainer.innerHTML = `<p class="error-message">L'analyse a échoué. Vérifiez la console pour plus de détails.</p>`;
+        resultsContainer.innerHTML = `<p class="error-message">${error.message}</p>`;
     } finally {
         // 4. Rétablir le bouton
         analyzeBtn.disabled = false;
@@ -665,10 +651,10 @@ export function loadUrlAnalyzerView(viewContainer) {
 
                 </div>
                 <div class="on-demand-pane" id="header-pane">
-                    <p>Contenu à venir pour l'analyse d'en-tête...</p>
+                    <p>Contenu à venir pour l\'analyse d\'en-tête...</p>
                 </div>
                 <div class="on-demand-pane" id="message-pane">
-                    <p>Contenu à venir pour l'analyse de message...</p>
+                    <p>Contenu à venir pour l\'analyse de message...</p>
                 </div>
             </div>
         </div>

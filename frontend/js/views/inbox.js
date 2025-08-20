@@ -124,7 +124,7 @@ async function handleEmailClick(emailId) {
     }
 
         // 1. On OUVRE la modale immédiatement. Elle sera vide ou en état de chargement.
-    openModal();
+    openModal('emailModal');
     // 2. On affiche l'état "en attente" PENDANT que les données sont préparées.
     showPendingStateInModal();
   
@@ -145,6 +145,7 @@ async function handleEmailClick(emailId) {
             analysisResult = state.analysisCache[emailId];
         } catch (e) {
             console.error('Analyse à la demande échouée:', e);
+            analysisResult = { phishgard_verdict: "Erreur", confidence_score: "N/A", breakdown: {}, error: e.message };
         }
     }
 
@@ -161,6 +162,7 @@ async function analyzeSingleEmail(email) {
     } catch (error) {
         console.error(`L'analyse de l'email ${email.id} a échoué:`, error);
         state.analysisCache[email.id] = { phishgard_verdict: "Erreur", confidence_score: "N/A", breakdown: {} };
+        throw error;
     } finally {
         email.isAnalyzing = false;
         refreshSingleEmailInList(email.id);
@@ -173,7 +175,7 @@ async function startBackgroundAnalysis() {
         if (!state.analysisCache[email.id]) {
             email.isAnalyzing = true;
             refreshSingleEmailInList(email.id);
-            await analyzeSingleEmail(email);
+            await analyzeSingleEmail(email).catch(err => console.error(`background analysis failed for ${email.id}`, err));
         }
     }
 }
@@ -239,6 +241,7 @@ export async function loadInboxView(viewContainer) {
         state.pollingIntervalId = setInterval(pollForNewEmails, POLLING_INTERVAL_MS);
     } catch (error) {
         console.error('Impossible de charger la vue Boîte de réception:', error);
-        appView.innerHTML = '<p class="loading-message">Erreur: Impossible de charger les emails.</p>';
+        const container = document.getElementById('email-list-container');
+        if(container) container.innerHTML = `<p class="error-message">${error.message}</p>`;
     }
 }

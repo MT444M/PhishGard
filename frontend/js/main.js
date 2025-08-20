@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const userMenuBtn = document.getElementById('user-menu-btn');
     const userDropdownMenu = document.getElementById('user-dropdown-menu');
     const modal = document.getElementById('emailModal');
+    const modalCloseBtn = document.getElementById('modal-close-btn');
 
     // Écouteur pour ouvrir/fermer le menu utilisateur
     if (userMenuBtn && userDropdownMenu) {
@@ -42,9 +43,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    if(modalCloseBtn) {
+        modalCloseBtn.addEventListener('click', () => closeModal());
+    }
+
     // Charge la vue initiale
     handleRouteChange();
 });
-
-// Expose closeModal globalement pour le bouton "x" (inchangé)
-window.closeModal = closeModal;

@@ -6,25 +6,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PhishGard</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/utilities.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
     <!-- Contenu de la page -->
     <div class="container">
         <div class="header">
-
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>PhishGard</title>
-                
-                <link rel="preconnect" href="https://fonts.googleapis.com">
-                <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-                <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-                
-                <link rel="stylesheet" href="css/style.css">
-            </head>
-
             <div class="logo">
                 <div class="shield-icon">🛡️</div>
                 <div class="logo-text">
@@ -112,7 +104,49 @@
             </nav>
 
             <!-- Contenu principal --> 
-            <main id="app-view" class="main-panel">. <!--c'est le router qui gère le contenu ici-->
+            <main id="app-view" class="main-panel">
+                <div id="inbox-view" class="view-container"></div>
+                <div id="analyzer-view" class="view-container hidden"></div>
+                <!-- <div id="dashboard-view" class="view-container hidden"></div> -->
+                <div id="dashboard-view" class="view-container hidden">
+                    <div class="dashboard-toolbar">
+                        <h2 class="view-title">Tableau de Bord</h2>
+                        <div class="date-filter">
+                            <select id="dashboard-period-select">
+                                <option value="7d">7 derniers jours</option>
+                                <option value="30d">30 derniers jours</option>
+                                <option value="today">Aujourd'hui</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-grid">
+                        <div class="widget-card kpi-card" id="kpi-emails-analyzed">
+                            </div>
+                        <div class="widget-card kpi-card" id="kpi-phishing-detected">
+                            </div>
+                        <div class="widget-card kpi-card" id="kpi-threat-rate">
+                            </div>
+
+                        <div class="widget-card chart-card-large">
+                            <h5 class="widget-title">Volume d'emails par statut</h5>
+                            <canvas id="emailsByStatusChart"></canvas>
+                        </div>
+
+                        <div class="widget-card chart-card-small">
+                            <h5 class="widget-title">Répartition des statuts</h5>
+                            <canvas id="statusDistributionChart"></canvas>
+                        </div>
+
+                        <div class="widget-card list-card">
+                            <h5 class="widget-title">Dernières menaces détectées</h5>
+                            <ul id="latest-threats-list" class="threat-list">
+                                </ul>
+                        </div>
+                    </div>
+                </div>
+                <div id="news-view" class="view-container hidden"></div>
+                <div id="settings-view" class="view-container hidden"></div>
             </main>
 
             <aside id="contextual-sidebar" class="contextual-sidebar">
@@ -201,9 +235,18 @@
         
 
     <!-- Modals -->
-    <div id="emailModal" class="modal" style="display: none;">
+    <div id="emailModal" class="modal hidden">
         <div class="modal-content">
-        <div id="modal-verdict-banner" class="modal-verdict-banner verdict-pending"></div>
+        <div id="modal-verdict-banner" class="modal-verdict-banner verdict-pending">
+            <span class="verdict-icon"></span>
+            <div>
+                <div class="verdict-text"></div>
+                <div class="verdict-confidence"></div>
+            </div>
+            <span class="close" id="modal-close-btn" title="Fermer">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </span>
+        </div>
     
         <div class="modal-body">
             <div class="modal-tabs">
@@ -219,10 +262,11 @@
                 <h5 class="block-title">Facteurs Clés de Décision</h5>
                 <ul id="summary-factors-list"></ul>
                 </div>
-                <div class="summary-ai-block" style="display: none;">
+                <div class="summary-ai-block hidden-initially">
                 <p id="summary-ai-text">...</p>
                 </div>
             </div>
+            
     
             <div class="tab-pane" id="tab-details">
                 <details class="report-section" open>

@@ -40,9 +40,24 @@ function repairUtf8Mojibake(text) {
 }
 
 // --- Fonctions de gestion de la modale (ouverture/fermeture/onglets) ---
-const modalElement = document.getElementById('emailModal');
-export function openModal() { if (modalElement) modalElement.style.display = 'flex'; }
-export function closeModal() { if (modalElement) modalElement.style.display = 'none'; }
+
+export function openModal(modalId) {
+    const modalElement = document.getElementById(modalId);
+    if (modalElement) {
+        modalElement.style.display = 'flex';
+    } else {
+        console.error("Modal element with id '" + modalId + "' not found.");
+    }
+}
+
+export function closeModal(modalId) {
+    const modalElement = document.getElementById(modalId);
+    if (modalElement) {
+        modalElement.style.display = 'none';
+    } else {
+        console.error("Modal element with id '" + modalId + "' not found.");
+    }
+}
 
 
 /**
@@ -87,7 +102,7 @@ export function showPendingStateInModal() {
                 <div class="verdict-text">Analyse en cours...</div>
                 <div class="verdict-confidence">Veuillez patienter</div>
             </div>
-            <span class="close" onclick="closeModal()" title="Fermer">
+            <span class="close" id="modal-close-btn" title="Fermer">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </span>`;
     }
@@ -104,7 +119,7 @@ export function showPendingStateInModal() {
     if (summaryAI) summaryAI.innerText = '...';
 
     // 3. Mettre à jour l'onglet Analyse Détaillée (vider les sections)
-    const loadingMessage = '<p style="padding: 1rem; color: var(--text-secondary);">Chargement des données...</p>';
+    const loadingMessage = '<p class="loading-message-text">Chargement des données...</p>';
     const detailsOrigin = document.getElementById('details-origin-content');
     const detailsPath = document.getElementById('details-path-content');
     const detailsContent = document.getElementById('details-content-content');
@@ -118,7 +133,7 @@ export function showPendingStateInModal() {
     // 4. Mettre à jour la prévisualisation de l'email
    const previewContentArea = document.querySelector('#email-preview-container .email-preview-content');
     if (previewContentArea) {
-        previewContentArea.innerHTML = `<p style="text-align: center; padding: 2rem; color: var(--text-secondary);">Chargement du contenu de l'email...</p>`;
+        previewContentArea.innerHTML = `<p class="loading-message-text">Chargement du contenu de l'email...</p>`;
     }
 }
 
@@ -162,11 +177,15 @@ function populateVerdictBanner(data) {
             <div class="verdict-text">${verdict}</div>
             <div class="verdict-confidence">Niveau de confiance : ${confidence}</div>
         </div>
-        <span class="close" onclick="closeModal()" title="Fermer">
+        <span class="close" title="Fermer">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </span>`;
+    // Ajoute le gestionnaire d'événement JS au bouton de fermeture
+    const closeBtn = banner.querySelector('.close');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => closeModal('emailModal'));
+    }
 }
-
 
 
 // js/components/modal.js
