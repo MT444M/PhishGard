@@ -172,7 +172,7 @@ function populateVerdictBanner(data) {
 // js/components/modal.js
 
 /**
- * Remplit l'onglet "Synthèse".
+ * Remplit l\'onglet "Synthèse".
  * VERSION ENTIÈREMENT REVUE AVEC CARTE ET ANNEAU DE SCORE
  */
 function populateSummaryTab(data) {
@@ -180,21 +180,21 @@ function populateSummaryTab(data) {
     const verdictBlock = tabContent.querySelector('.summary-verdict-block');
     const factorsList = document.getElementById('summary-factors-list');
 
-    // 1. Préparation des données pour l'affichage
+    // 1. Préparation des données pour l\'affichage
     const verdict = data.phishgard_verdict || 'Indéterminé';
     const score = parseFloat(data.final_score_internal ?? 0);
     const absScore = Math.abs(score);
     const verdictClass = `verdict-${verdict.toLowerCase().replace(' ', '-')}`;
 
     // On convertit le score (supposé sur une échelle de 100) en degrés (0-360)
-    // On s'assure que le score visuel ne dépasse pas 100 pour l'anneau.
+    // On s\'assure que le score visuel ne dépasse pas 100 pour l\'anneau.
     const scoreForRing = Math.min(absScore, 100);
     const scoreDegrees = (scoreForRing / 100) * 360;
 
     // 2. Réinitialisation et stylisation de la carte de verdict
     verdictBlock.innerHTML = ''; // On vide la carte
     verdictBlock.className = 'summary-verdict-block'; // On réinitialise ses classes
-    verdictBlock.classList.add(verdictClass); // On ajoute la classe pour la couleur de l'anneau
+    verdictBlock.classList.add(verdictClass); // On ajoute la classe pour la couleur de l\'anneau
 
     // 3. Création et assemblage de la nouvelle structure HTML
     const ringEl = document.createElement('div');
@@ -211,13 +211,13 @@ function populateSummaryTab(data) {
     textEl.className = 'summary-text';
     textEl.innerText = verdict;
 
-    // On ajoute le score dans l'anneau
+    // On ajoute le score dans l\'anneau
     ringEl.appendChild(scoreEl);
-    // On ajoute l'anneau et le verdict à la carte
+    // On ajoute l\'anneau et le verdict à la carte
     verdictBlock.appendChild(ringEl);
     verdictBlock.appendChild(textEl);
 
-    // On ajoute le sous-titre si l'information existe
+    // On ajoute le sous-titre si l\'information existe
     if (data.summary) {
         const subtitleEl = document.createElement('p');
         subtitleEl.className = 'summary-subtitle';
@@ -244,8 +244,8 @@ function populateSummaryTab(data) {
 
 /**
  * Génère les 2-3 facteurs clés de la décision pour la synthèse.
- * @param {object} data - Le rapport d'analyse.
- * @returns {string[]} - Une liste d'éléments HTML <li>.
+ * @param {object} data - Le rapport d\'analyse.
+ * @returns {string[]} - Une liste d\'éléments HTML <li>.
  */
 function generateKeyFactors(data) {
     const factors = [];
@@ -255,14 +255,14 @@ function generateKeyFactors(data) {
 
     // Priorité 1: Analyse du contenu
     if (breakdown.llm_analysis?.classification === 'PHISHING') {
-        factors.push({ text: "Le contenu de l'e-mail est jugé malveillant par l'IA", type: 'high' });
+        factors.push({ text: "Le contenu de l\'e-mail est jugé malveillant par l\'IA", type: 'high' });
     }
     
     // Priorité 2: Analyse Heuristique (points négatifs)
     if (breakdown.heuristic_analysis?.classification === 'PHISHING') {
-        factors.push({ text: "Échec critique de l'authentification de l'expéditeur", type: 'high' });
+        factors.push({ text: "Échec critique de l\'authentification de l\'expéditeur", type: 'high' });
     } else if (breakdown.heuristic_analysis?.authentication_strength === 'weak') {
-        factors.push({ text: "L'authentification de l'expéditeur est faible", type: 'medium' });
+        factors.push({ text: "L\'authentification de l\'expéditeur est faible", type: 'medium' });
     }
 
     // Priorité 3: Analyse des liens
@@ -272,10 +272,10 @@ function generateKeyFactors(data) {
     
     // Point positif pour équilibrer
     if (breakdown.heuristic_analysis?.authentication_strength === 'strong') {
-        factors.push({ text: "L'expéditeur a été authentifié avec succès", type: 'low' });
+        factors.push({ text: "L\'expéditeur a été authentifié avec succès", type: 'low' });
     }
 
-    const icons = {
+    const icons = { 
         high: '<svg style="color: var(--risk-high-solid);"...></svg>', // (SVG complet omis pour la lisibilité)
         medium: '<svg style="color: var(--risk-medium-solid);"...></svg>',
         low: '<svg style="color: var(--risk-low-solid);"...></svg>'
@@ -291,11 +291,11 @@ function generateKeyFactors(data) {
 
 
 /**
- * Remplit l'onglet "Analyse Détaillée" en appelant des sous-fonctions.
+ * Remplit l\'onglet "Analyse Détaillée" en appelant des sous-fonctions.
  */
 function populateDetailsTab(data) {
     // data peut être 'analysisData' ou 'analysisData.breakdown'
-    // On nettoie d'abord les placeholders "Chargement..." pour éviter qu'ils ne restent affichés
+    // On nettoie d\'abord les placeholders "Chargement..." pour éviter qu\'ils ne restent affichés
     const originEl = document.getElementById('details-origin-content');
     const contentEl = document.getElementById('details-content-content');
     const techEl = document.getElementById('details-tech-content');
@@ -327,12 +327,12 @@ function populateDetailsTab(data) {
     }
 }
 
-// --- SOUS-FONCTIONS POUR L'ONGLET DÉTAILLÉ ---
+// --- SOUS-FONCTIONS POUR L\'ONGLET DÉTAILLÉ ---
 
 // js/components/modal.js
 
 /**
- * Remplit la section "Origine & Réputation", incluant maintenant l'analyse du trajet.
+ * Remplit la section "Origine & Réputation", incluant maintenant l\'analyse du trajet.
  * VERSION AMÉLIORÉE
  */
 function populateOriginSection(osint) {
@@ -347,7 +347,7 @@ function populateOriginSection(osint) {
     // --- Partie 1 : Analyse IP (inchangée) ---
     let ipHTML = '<h4>Analyse IP</h4>';
     if (osint.ip_analysis?.length > 0) {
-        // ... (le code existant pour l'IP reste ici, pas besoin de le copier)
+        // ... (le code existant pour l\'IP reste ici, pas besoin de le copier)
         const ipInfo = osint.ip_analysis[0];
         const location = [ipInfo.ipinfo?.city, ipInfo.ipinfo?.country].filter(Boolean).join(', ');
         ipHTML += `
@@ -369,7 +369,7 @@ function populateOriginSection(osint) {
                     <span class="fact-value">${ipInfo.abuseipdb?.isp ?? 'N/A'}</span>
                 </div>
                 <div class="fact-row">
-                    <span class="fact-label">Score d'Abus</span>
+                    <span class="fact-label">Score d\'Abus</span>
                     <span class="fact-value">${ipInfo.abuseipdb?.abuseConfidenceScore ?? 'N/A'}%</span>
                 </div>
             </div>`;
@@ -427,8 +427,6 @@ function populateOriginSection(osint) {
 }
 
 
-
-
 /**
  * Remplit la section "Contenu & Intention" avec un affichage des URLs amélioré.
  * VERSION AMÉLIORÉE
@@ -440,7 +438,7 @@ function populateContentSection(llm, urlMl) {
     let llmHTML = '';
     let urlsHTML = '';
 
-    // --- Partie 1 : Analyse du Contenu par l'IA (inchangée) ---
+    // --- Partie 1 : Analyse du Contenu par l\'IA (inchangée) ---
     if (llm) {
         // ... (le code de cette section reste le même)
         let reasonText = escapeHTML(llm.reason ?? 'Aucune raison fournie.');
@@ -463,27 +461,28 @@ function populateContentSection(llm, urlMl) {
         urlsHTML = '<div class="content-analysis-block"><h4>Analyse des URLs</h4><div class="url-list">';
         
         urlDetails.forEach(item => {
-            const verdict = (item.verdict || item.classification || 'N/A').toString();
-            const riskClass = { 'phishing': 'high-risk', 'suspicious': 'medium-risk', 'legitimate': 'low-risk' }[verdict] || '';
-            const probability = verdict.toLowerCase() === 'phishing' 
+            const rawVerdict = (item.verdict || item.classification || 'N/A').toString();
+            const cleanVerdict = rawVerdict.replace(/[^a-zA-Z]/g, '').toLowerCase();
+            const riskClass = { 'phishing': 'high-risk', 'suspicious': 'medium-risk', 'legitimate': 'low-risk' }[cleanVerdict] || '';
+            const probability = urlMl.prediction === 'phishing' 
                 ? (item.probability_phishing ?? item.phishing_probability ?? item.score ?? item.confidence) 
                 : (item.probability_legitimate ?? item.legitimate_probability ?? item.score ?? item.confidence);
             const score = probability ? `${parseFloat(probability).toFixed(0)}%` : 'N/A';
 
-            // --- NOUVEAU : Extraction du nom de domaine comme texte d'ancre ---
+            // --- NOUVEAU : Extraction du nom de domaine comme texte d\'ancre ---
             let anchorText = 'Lien'; // Fallback
             try {
-                // On utilise l'objet URL natif du navigateur pour parser le lien
+                // On utilise l\'objet URL natif du navigateur pour parser le lien
                 const urlObj = new URL(item.url || item.href || item.link || '');
                 anchorText = urlObj.hostname; // ex: "email.mg.ipinfo.io"
             } catch (e) {
-                // Si l'URL est malformée, on garde une version tronquée
+                // Si l\'URL est malformée, on garde une version tronquée
                 const raw = (item.url || item.href || item.link || '').toString();
                 anchorText = raw.length > 50 ? raw.substring(0, 50) + '...' : raw;
                 if (raw) console.warn('URL malformée détectée :', raw);
             }
 
-            // --- NOUVEAU : Construction de la nouvelle structure HTML pour l'URL ---
+            // --- NOUVEAU : Construction de la nouvelle structure HTML pour l\'URL ---
             urlsHTML += `
                 <div class="url-item">
                     <div class="url-text-content">
@@ -493,7 +492,7 @@ function populateContentSection(llm, urlMl) {
 
                     <div class="url-actions">
                          <div class="url-meta-content">
-                            <span class="url-verdict ${riskClass}">${escapeHTML(verdict)}</span>
+                            <span class="url-verdict ${riskClass}">${escapeHTML(rawVerdict)}</span>
                             <span class="text-muted" title="Score de confiance"><strong>${score}</strong></span>
                         </div>
                         <button class="copy-btn" data-url="${escapeHTML(item.url || item.href || item.link || '')}" title="Copier le lien complet">
@@ -511,7 +510,7 @@ function populateContentSection(llm, urlMl) {
         container.innerHTML = '<p class="text-muted">Aucune analyse de contenu disponible.</p>';
     }
 
-    // --- Partie 3 : Ré-attacher l'interactivité pour le bouton "copier" (inchangée) ---
+    // --- Partie 3 : Ré-attacher l\'interactivité pour le bouton "copier" (inchangée) ---
     container.querySelectorAll('.copy-btn').forEach(button => {
         // ... (le code de cette section reste le même)
         button.addEventListener('click', (event) => {
@@ -526,8 +525,6 @@ function populateContentSection(llm, urlMl) {
         });
     });
 }
-
-
 
 
 /**
@@ -556,7 +553,7 @@ function populateTechSection(heuristic) {
     let techHTML = `
         <div class="fact-sheet">
             <div class="fact-row">
-                <span class="fact-label">Force de l'authentification</span>
+                <span class="fact-label">Force de l\'authentification</span>
                 <span class="fact-value">${prettyStrength}</span>
             </div>
         </div>`;
@@ -577,8 +574,8 @@ function populateTechSection(heuristic) {
 
 
 /**
- * Remplit l'iframe de prévisualisation de l'e-mail en forçant l'encodage UTF-8.
- * VERSION CORRIGÉE POUR L'ENCODAGE
+ * Remplit l\'iframe de prévisualisation de l\'e-mail en forçant l\'encodage UTF-8.
+ * VERSION CORRIGÉE POUR L\'ENCODAGE
  */
 function populateEmailPreview(emailObject, analysisData) {
     const contentArea = document.querySelector('#email-preview-container .email-preview-content');
@@ -613,7 +610,7 @@ function populateEmailPreview(emailObject, analysisData) {
         bodyContent = analysisData.email.body;
     }
 
-    // --- MODIFIÉ : Ajout de la gestion de l'encodage UTF-8 ---
+    // --- MODIFIÉ : Ajout de la gestion de l\'encodage UTF-8 ---
     if (bodyContent) {
         if (isHtml) {
             // Pour le contenu HTML, on s'assure que la balise meta charset est présente.
@@ -625,7 +622,7 @@ function populateEmailPreview(emailObject, analysisData) {
             }
         } else {
             // Pour le texte brut, on construit un petit document HTML complet
-            // en forçant l'UTF-8 et en utilisant un style qui imite le texte brut.
+            // en forçant l\'UTF-8 et en utilisant un style qui imite le texte brut.
             const normalized = looksLikeMojibake(bodyContent) ? repairUtf8Mojibake(bodyContent) : bodyContent;
             const escapedBody = escapeHTML(normalized);
             iframe.srcdoc = `
@@ -648,14 +645,14 @@ function populateEmailPreview(emailObject, analysisData) {
         }
     } else {
         // Dernier recours : message d'absence de contenu
-        iframe.srcdoc = `<p style="font-family: sans-serif; color: #888; padding: 1rem; text-align: center;">Le contenu de l'email n'est pas disponible.</p>`;
+        iframe.srcdoc = `<p style="font-family: sans-serif; color: #888; padding: 1rem; text-align: center;">Le contenu de l\'email n\'est pas disponible.</p>`;
     }
     
     contentArea.appendChild(iframe);
 }
 
 /**
- * Remplit les 3 cartes de méthodes d'analyse dans l'onglet de synthèse.
+ * Remplit les 3 cartes de méthodes d\'analyse dans l\'onglet de synthèse.
  * VERSION CORRIGÉE ET ROBUSTIFIÉE
  */
 function generateMethodCards(breakdown) {
@@ -678,23 +675,20 @@ function generateMethodCards(breakdown) {
     }
 
     // --- Carte 2: Analyse des URLs ---
-    // On vérifie maintenant si un verdict existe réellement
-    if (urlMl && urlMl.prediction && urlMl.prediction !== 'N/A') {
-        const verdict = urlMl.prediction.toLowerCase();
-        const probability = verdict === 'phishing' 
-            ? urlMl.probability_phishing 
-            : urlMl.probability_legitimate;
-        const score = probability ? parseFloat(probability).toFixed(0) : '--';
+    if (urlMl && urlMl.verdict && urlMl.verdict !== 'N/A') {
+        const rawVerdict = urlMl.verdict.toString();
+        const cleanVerdict = rawVerdict.replace(/[^a-zA-Z]/g, '').toLowerCase();
+        const score = urlMl.confidence ? parseFloat(urlMl.confidence).toFixed(0) : '--';
         
         cardsHTML += `
             <div class="method-card">
                 <div class="method-card-title">Analyse URLs</div>
                 <div class="method-card-score">${score}<span class="unit">%</span></div>
-                <div class="method-card-verdict ${verdict}">${verdict}</div>
+                <div class="method-card-verdict ${cleanVerdict}">${cleanVerdict}</div>
             </div>
         `;
     } else {
-        // Cas où il n'y a pas d'URL à analyser
+        // Cas où il n\'y a pas d\'URL à analyser
         cardsHTML += `
             <div class="method-card">
                 <div class="method-card-title">Analyse URLs</div>

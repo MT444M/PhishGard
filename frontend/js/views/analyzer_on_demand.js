@@ -623,14 +623,14 @@ async function handleUrlAnalysis() {
  * Génère le HTML de la vue "Analyse à la demande", incluant le formulaire,
  * et attache les écouteurs d'événements nécessaires.
  */
-export function loadUrlAnalyzerView() {
-    const appContainer = document.getElementById('app-view'); 
-    if (!appContainer) {
-        console.error("Le conteneur principal ('app-view') est introuvable.");
-        return;
+export function loadUrlAnalyzerView(viewContainer) {
+    // On vérifie si le contenu a déjà été dessiné
+    if (viewContainer.innerHTML.trim() !== '') {
+        return; // Si oui, on ne fait rien
     }
 
-    appContainer.innerHTML = `
+      // Si c'est la première visite, on dessine le HTML
+    viewContainer.innerHTML = `
         <div class="on-demand-container">
             <nav class="on-demand-tabs">
                 <button class="on-demand-tab-button active" data-tab="url-pane">

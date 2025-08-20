@@ -206,7 +206,7 @@ class URLOrchestrator:
 
         return {
             "prediction": 0 if is_phishing else 1,
-            "verdict": "⚠️ Phishing" if is_phishing else "✅ Legitimate",
+            "verdict": "Phishing" if is_phishing else "Legitime",
             "confidence": f"{proba_phishing:.2%}",
             "risk_level": risk_level,
             "probability": {
