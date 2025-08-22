@@ -1,0 +1,169 @@
+/* Barre d'outils du tableau de bord */
+.dashboard-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+/* Grille principale */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+}
+
+/* Styles de base pour les cartes */
+.widget-card {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+/* Cartes KPI */
+.kpi-card {
+    grid-column: span 1;
+}
+
+/* Grande carte pour le graphique principal */
+.chart-card-large {
+    grid-column: span 2;
+}
+
+/* Petite carte pour le donut */
+.chart-card-small {
+    grid-column: span 1;
+}
+
+/* Carte pour la liste */
+.list-card {
+    grid-column: span 3;
+}
+
+.widget-title {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+    color: #555;
+}
+
+/* Styles pour la liste des menaces (à compléter) */
+.threat-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* Style pour l'état de chargement */
+.view-container.loading {
+    opacity: 0.5;
+    pointer-events: none; /* Empêche les clics pendant le chargement */
+    transition: opacity 0.3s ease-in-out;
+}
+
+/* Améliorations pour la liste des menaces */
+.threat-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #eee;
+}
+.threat-item:last-child {
+    border-bottom: none;
+}
+
+.threat-details {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-grow: 1;
+    overflow: hidden;
+}
+
+.threat-status {
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #fff;
+    flex-shrink: 0;
+}
+.threat-status.phishing { background-color: #dc3545; }
+.threat-status.suspicious { background-color: #ffc107; color: #333; }
+
+.threat-subject {
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.threat-sender {
+    color: #666;
+}
+
+.threat-meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 0.8rem;
+    color: #888;
+    flex-shrink: 0;
+}
+
+.threat-item-empty {
+    text-align: center;
+    padding: 2rem;
+    color: #888;
+}
+
+/* =============================================== */
+/* --- SECTION AJOUTÉE POUR LES CORRECTIFS --- */
+/* =============================================== */
+
+/* --- 1. Correctif pour la hauteur des graphiques --- */
+.chart-container {
+    position: relative;
+    /* On donne une hauteur fixe pour que les graphiques s'affichent correctement */
+    height: 300px;
+}
+
+/* --- 2. Correctifs pour les cartes KPI (texte et alignement) --- */
+.kpi-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* On force la couleur du texte pour les chiffres des KPIs */
+.kpi-card .stat-number {
+    color: #2c3e50; /* Couleur sombre pour être visible sur fond blanc */
+    font-size: 2rem;
+    font-weight: 600;
+}
+
+/* On force la couleur du texte pour les libellés des KPIs */
+.kpi-card .stat-label {
+    color: #7f8c8d; /* Couleur grise pour être visible sur fond blanc */
+    font-size: 0.9rem;
+}
+
+/* Styles pour les indicateurs de tendance (flèches et pourcentages) */
+.stat-trend {
+    font-weight: 600;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+}
+
+.stat-trend.positive {
+    color: #27ae60; /* Vert */
+    background-color: rgba(39, 174, 96, 0.1);
+}
+
+.stat-trend.negative {
+    color: #c0392b; /* Rouge */
+    background-color: rgba(192, 57, 43, 0.1);
+}

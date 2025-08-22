@@ -8,8 +8,14 @@ PhishGard-AI/
 │   ├── __init__.py
 │   ├── email_client.py        # Gère TOUTE l'interaction avec l'API Gmail (auth, fetch, etc.)
 │   ├── email_orchestrator.py # Le "cerveau" qui organise les analyses d'un e-mail 
-|   └── url_orchestrator.py # Le "cerveau" qui organise les analyses d'une URL
+│   └── url_orchestrator.py # Le "cerveau" qui organise les analyses d'une URL et  l'analyse contextuelle
     └── final_aggregator.py.    # la fusion des score de prediction
+
+├── database/                  
+│   ├── __init__.py
+│   ├── database.py            # Configuration et gestion des sessions DB
+│   ├── models.py              # Définition des tables (schéma) via SQLAlchemy
+│   └── crud.py                # Fonctions CRUD (Create, Read, Update, Delete)
 │
 ├── email_analysis/
 │   ├── __init__.py
@@ -18,7 +24,7 @@ PhishGard-AI/
 │   ├── llm_analyzer.py        # Classe pour l'analyse par le LLM
 │   └── osint_enricher.py      # Fonctions et classes pour l'enrichissement OSINT
 |
-├── url_analysis/                  # <== NOUVEAU
+├── url_analysis/                  
 │   ├── __init__.py
 │   ├── domain_whois.py        # Analyse du domaine et WHOIS
 │   ├── feature_derivation.py        # Extraction de caractères et caractères complexes

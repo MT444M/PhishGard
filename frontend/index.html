@@ -11,6 +11,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 </head>
 
 <body>
@@ -42,18 +44,9 @@
                     </div>
                     <div class="stat-info">
                         <div class="stat-number">89</div>
-                        <div class="stat-label">Phishing détectés</div>
+                        <div class="stat-label">Menaces détectés</div>
                     </div>
                     <div class="stat-trend negative">▼ -2%</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-icon-wrapper">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
-                    </div>
-                    <div class="stat-info">
-                        <div class="stat-number">99.2%</div>
-                        <div class="stat-label">Précision</div>
-                    </div>
                 </div>
             </div>
             <div class="user-menu-wrapper">
@@ -130,12 +123,16 @@
 
                         <div class="widget-card chart-card-large">
                             <h5 class="widget-title">Volume d'emails par statut</h5>
-                            <canvas id="emailsByStatusChart"></canvas>
+                            <div class="chart-container">
+                                <canvas id="emailsByStatusChart"></canvas>
+                            </div>
                         </div>
 
                         <div class="widget-card chart-card-small">
                             <h5 class="widget-title">Répartition des statuts</h5>
-                            <canvas id="statusDistributionChart"></canvas>
+                            <div class="chart-container">
+                                <canvas id="statusDistributionChart"></canvas>
+                            </div>
                         </div>
 
                         <div class="widget-card list-card">

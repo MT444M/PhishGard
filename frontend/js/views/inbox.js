@@ -82,6 +82,17 @@ function createEmailItemHTML(email) {
     const initials = senderName.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase() || 'P';
     const statusIndicator = email.isAnalyzing ? '<div class="spinner"></div>' : `<div class="sender-avatar">${initials}</div>`;
 
+    // Formatage du timestamp en français
+    let formattedTimestamp = email.timestamp;
+    try {
+        const dateObj = new Date(email.timestamp);
+        if (!isNaN(dateObj.getTime())) {
+            formattedTimestamp = dateObj.toLocaleDateString('fr-FR', {
+                weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+            });
+        }
+    } catch {}
+
     return `
         <div class="email-item ${riskClass}" data-email-id="${email.id}">
             ${statusIndicator}
@@ -91,7 +102,7 @@ function createEmailItemHTML(email) {
                         <span class="sender">${senderName}</span>
                         <span class="sender-email">&lt;${senderEmail}&gt;</span>
                     </div>
-                    <div class="timestamp">${email.timestamp}</div>
+                    <div class="timestamp" style="margin-right:8.5rem; color:var(--text-secondary); min-width:140px; text-align:right;">${formattedTimestamp}</div>
                 </div>
                 <div class="subject">${escapeHTML(email.subject)}</div>
                 <div class="preview">${escapeHTML(email.preview)}</div>

@@ -28,3 +28,7 @@ selenium
 # Web Framework
 uvicorn 
 fastapi
+
+# database
+"sqlalchemy[asyncio]" aiosqlite
+# psycopg2-binary # pour postgresql

@@ -18,3 +18,9 @@
 .email-score-pill.high-risk { background-color: var(--risk-high-solid); }
 .email-score-pill.medium-risk { background-color: var(--risk-medium-solid); color: var(--text-primary); }
 .email-score-pill.low-risk { background-color: var(--risk-low-solid); }
+#app-view.main-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%; /* Important pour qu'il ait une hauteur définie */
+  overflow-y: auto;
+}

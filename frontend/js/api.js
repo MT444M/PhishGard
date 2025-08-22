@@ -1,5 +1,5 @@
-import { API_BASE_URL } from './config.js';
 
+import { API_BASE_URL } from './config.js';
 // js/api.js
 // gére tous les appels fetch vers le backend
 
@@ -73,5 +73,34 @@ export async function analyzeUrlPredict(url) {
     } catch (error) {
         console.error(`Network error while analyzing url prediction for ${url}:`, error);
         throw new Error(`Impossible de se connecter au serveur pour analyser la prédiction de l'URL.`);
+    }
+}
+
+
+
+
+/**
+ * Récupère les données du tableau de bord depuis l'API backend.
+ * @param {number} period Le nombre de jours pour la période (ex: 7, 30).
+ * @returns {Promise<Object>} Les données du tableau de bord.
+ */
+export async function getDashboardData(period = 7) {
+    // 2. Utiliser la variable importée pour construire l'URL
+    const url = `${API_BASE_URL}/api/dashboard/summary?period=${period}`;
+    console.log(`Fetching REAL data from: ${url}`);
+    
+    try {
+        const response = await fetch(url);
+        
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({ detail: `Erreur HTTP ${response.status}` }));
+            throw new Error(errorData.detail);
+        }
+        
+        return await response.json();
+
+    } catch (error) {
+        console.error("Erreur lors de la récupération des données du tableau de bord:", error);
+        throw error;
     }
 }

@@ -6,12 +6,13 @@ class FinalAggregator:
     # Les poids sont maintenant chargés depuis la configuration
     WEIGHTS = settings.FINAL_VERDICT_WEIGHTS
 
-    def __init__(self, heuristic_results, url_model_results, llm_results, osint_results):
+    def __init__(self, heuristic_results, url_model_results, llm_results, osint_results, email_id=None):
         # On ajoute les résultats OSINT pour les règles de véto
         self.heuristic_results = heuristic_results
         self.url_model_results = url_model_results
         self.llm_results = llm_results
-        self.osint_results = osint_results # <== NOUVEAU
+        self.osint_results = osint_results
+        self.email_id = email_id
         self.final_score = 0
         self.final_classification = "UNPROCESSED"
         self.veto_applied = False
@@ -91,6 +92,7 @@ class FinalAggregator:
     def _build_report(self):
         """Construit le dictionnaire de rapport final."""
         report = {
+            "id_email": self.email_id,
             "phishgard_verdict": self.final_classification,
             "confidence_score": f"{round(abs(self.final_score), 2)}%",
             "final_score_internal": round(self.final_score, 2),
@@ -104,6 +106,6 @@ class FinalAggregator:
              "heuristic_analysis": self.heuristic_results,
              "url_ml_analysis": self.url_model_results,
              "llm_analysis": self.llm_results,
-             "osint_enrichment": self.osint_results  # Ajout OSINT complet 
+             "osint_enrichment": self.osint_results
         }
         return report

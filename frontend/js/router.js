@@ -2,12 +2,14 @@
 
 import { loadInboxView } from './views/inbox.js';
 import { loadUrlAnalyzerView } from './views/analyzer_on_demand.js'; 
+import { initDashboardView } from './views/dashboard.js';
 
 // On enrichit la configuration des routes
 const routes = {
     '#/inbox':    { viewId: 'inbox-view',    load: loadInboxView,    showSidebar: true },
     '#/analyzer': { viewId: 'analyzer-view', load: loadUrlAnalyzerView, showSidebar: false },
-    // Ajoutez ici vos autres routes (dashboard, news, etc.)
+    '#/dashboard': { viewId: 'dashboard-view', load: initDashboardView, showSidebar: true },
+    // Ajoutez ici vos autres routes (news, etc.)
 };
 
 export function handleRouteChange() {

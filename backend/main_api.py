@@ -1,8 +1,13 @@
 # backend/main_api.py
 
 import uvicorn
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends
+from sqlalchemy.orm import Session 
 from fastapi.middleware.cors import CORSMiddleware
+
+from dashboard import dashboard_service
+from dashboard.schemas import DashboardResponse 
+
 from pydantic import BaseModel, Field
 import json
 import os
@@ -12,6 +17,15 @@ import os
 from core.email_orchestrator import EmailOrchestrator
 from core.url_orchestrator import URLOrchestrator
 from core import email_client # On garde l'authentification
+
+from database import crud, models
+from database.database import SessionLocal, engine
+
+# ==============================================================================
+# 0. CRÉATION DES TABLES DE LA BASE DE DONNÉES
+# ==============================================================================
+# Cette ligne crée les tables définies dans `models.py` si elles n'existent pas.
+models.Base.metadata.create_all(bind=engine)
 
 # ==============================================================================
 # 1. INITIALISATION DE L'APPLICATION FastAPI
@@ -45,13 +59,22 @@ class EmailAnalyzeRequest(BaseModel):
     # Pour l'instant on se base sur l'ID, on pourra ajouter le contenu brut plus tard
     email_id: str = Field(..., example="197640cc612987c5")
 
+
 # ==============================================================================
-# 3. INITIALISATION DES ORCHESTRATEURS
+# 3. GESTION DE LA SESSION DE BASE DE DONNÉES
 # ==============================================================================
-# On les initialise une seule fois au démarrage pour plus d'efficacité
-email_orchestrator = EmailOrchestrator()
-# Le client gmail est nécessaire pour l'orchestrateur d'email
+# Dépendance FastAPI pour obtenir une session de BDD par requête
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+# --- SUPPRIMER L'INITIALISATION GLOBALE DE L'ORCHESTRATEUR ---
+# email_orchestrator = EmailOrchestrator() # <== SUPPRIMER CETTE LIGNE
 gmail_service = email_client.authenticate_gmail()
+
 
 
 # ==============================================================================
@@ -78,7 +101,7 @@ def get_email_list():
     
     try:
         # Récupère les 25 derniers emails de la boîte de reception
-        live_emails = email_client.get_emails(gmail_service, max_results= 1)
+        live_emails = email_client.get_emails(gmail_service, max_results= 10)
         
         # Formatte les données pour le frontend.
         # Notez qu'il n'y a PAS de verdict ou de score ici au début.
@@ -93,6 +116,7 @@ def get_email_list():
                 "html_body": email.get('html_body', ''),  # Le corps HTML de l'email
                 "timestamp": email.get('timestamp', ''),  # Le timestamp de l'email
             })
+            #debug
         return formatted_emails
         
     except Exception as e:
@@ -100,47 +124,34 @@ def get_email_list():
         raise HTTPException(status_code=500, detail=f"Une erreur est survenue lors de la récupération des emails: {e}")
     
 
-    
-
-@app.post("/api/analyze/url")
-def analyze_url(request: URLAnalyzeRequest):
-    """
-    Analyse une URL fournie et renvoie la prédiction du modèle ML.
-    """
-    try:
-        url_orchestrator = URLOrchestrator(request.url)
-        url_orchestrator.collect_all_features()
-        prediction_result = url_orchestrator.get_prediction()
-        return prediction_result
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/analyze/email")
-def analyze_email(request: EmailAnalyzeRequest):
+def analyze_email(request: EmailAnalyzeRequest, db: Session = Depends(get_db)):
     """
     Analyse un email complet en utilisant son ID.
+    Vérifie le cache en BDD et sauvegarde le nouveau résultat.
     """
     if not gmail_service:
         raise HTTPException(status_code=503, detail="Service Gmail non disponible.")
     
     try:
-        # 1. Récupérer l'email complet via l'API Gmail
-        # Note : get_emails renvoie une liste, on prend le premier
         email_data_list = email_client.get_emails(gmail_service, email_id=request.email_id)
         if not email_data_list:
             raise HTTPException(status_code=404, detail=f"Email avec l'ID {request.email_id} non trouvé.")
         
         email_data = email_data_list[0]
         
-        # 2. Lancer l'analyse complète via l'orchestrateur
+        # --- MODIFIER L'INSTANCIATION DE L'ORCHESTRATEUR ---
+        # On l'instancie ici, en lui passant la session de BDD de la requête
+        email_orchestrator = EmailOrchestrator(db=db)
+        
         final_report = email_orchestrator.run_full_analysis(email_data)
-
 
         return final_report
     except Exception as e:
-        # Pour le débuggage, il est utile d'imprimer l'erreur côté serveur
         print(f"Erreur lors de l'analyse de l'email: {e}")
         raise HTTPException(status_code=500, detail=f"Une erreur interne est survenue: {e}")
+
     
 
 # --- NOUVEAUX Endpoints pour les URLs ---
@@ -172,7 +183,26 @@ def get_url_prediction(request: URLAnalyzeRequest):
     except Exception as e:
         print(f"Erreur lors de la prédiction pour l'URL: {e}")
         raise HTTPException(status_code=500, detail=f"Une erreur interne est survenue: {str(e)}")
+    
 
+# -----------------------------------------------------------------------------
+# ------ Nouveaux Endpoints pour le Dashboard -------
+# -----------------------------------------------------------------------------
+# On utilise `response_model` pour garantir que la sortie de l'API correspondra au schéma
+@app.get("/api/dashboard/summary", response_model=DashboardResponse)
+def get_dashboard_data(period: int = 7, db: Session = Depends(get_db)):
+    """
+    Endpoint principal pour le dashboard.
+    Récupère un résumé de toutes les métriques d'analyse.
+    """
+    try:
+        # La fonction `get_dashboard_summary` devra maintenant renvoyer
+        # un objet qui correspond à la structure de DashboardResponse.
+        summary_data = dashboard_service.get_dashboard_summary(db, period_days=period)
+        return summary_data
+    except Exception as e:
+        print(f"Erreur lors de la récupération des données du tableau de bord: {e}")
+        raise HTTPException(status_code=500, detail=f"Une erreur interne est survenue: {str(e)}")
 
 
 # ==============================================================================
