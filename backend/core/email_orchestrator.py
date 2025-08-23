@@ -6,6 +6,8 @@ import json
 # --- AJOUTS POUR LA BASE DE DONNÉES ---
 from sqlalchemy.orm import Session
 from database import crud
+
+from core import email_client
 # -----------------------------------------
 
 # Importe tous nos modules d'analyse spécialisés
@@ -37,7 +39,7 @@ class EmailOrchestrator:
         self.llm_analyzer_instance = llm_analyzer.LLMAnalyzer()
 
     # --- MÉTHODE D'ANALYSE ENTIÈREMENT MISE À JOUR ---
-    def run_full_analysis(self, email_data: dict):
+    def run_full_analysis(self, email_data: dict, gmail_service):
         """
         Exécute le pipeline d'analyse complet, avec vérification du cache
         et sauvegarde en base de données.
@@ -118,5 +120,20 @@ class EmailOrchestrator:
             analysis_report=final_report
         )
         print("      ... Sauvegarde réussie.")
+
+        # 5. NOUVEAU: APPLICATION DU LIBELLÉ SUR GMAIL
+        verdict = final_report.get("phishgard_verdict")
+        if verdict and verdict != "UNPROCESSED":
+            print(f"[LABEL] Début du processus d'étiquetage pour le verdict: {verdict}")
+            try:
+                # Obtenir l'ID du libellé (le crée s'il n'existe pas)
+                label_id = email_client.get_or_create_label_id(gmail_service, verdict)
+                # Appliquer le libellé à l'e-mail
+                email_client.apply_label_to_email(gmail_service, email_id, label_id)
+            except Exception as e:
+                # On ne veut pas que l'API échoue si l'étiquetage rate
+                print(f"[LABEL] ERREUR: Le processus d'étiquetage a échoué : {e}")
+
+
 
         return final_report

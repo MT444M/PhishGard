@@ -29,34 +29,45 @@ def _calculate_trend(current_value: float, previous_value: float) -> tuple[float
 
 # --- Fonction principale du service ---
 
-def get_dashboard_summary(db: Session, period_days: int = 7) -> schemas.DashboardResponse:
+def get_dashboard_summary(
+    db: Session,
+    period: str = '7d',
+    custom_start_date: str = None,
+    custom_end_date: str = None
+) -> schemas.DashboardResponse:
     """
     Fonction principale qui agrège toutes les métriques pour le dashboard.
     """
-    # --- 0. Définition des périodes de temps et de la langue ---
     try:
-        # Définit la langue pour les noms des jours (ex: 'Ven.' au lieu de 'Fri.')
         locale.setlocale(locale.LC_TIME, 'fr_FR.UTF-8')
     except locale.Error:
-        # Fallback au cas où la locale fr_FR n'est pas installée sur le système
         print("Avertissement: Locale 'fr_FR.UTF-8' non trouvée. Les jours seront en anglais.")
 
-    end_date = datetime.now(timezone.utc)
-    today = end_date.date()
-
-    if period_days == 7:
-        # Pour la vue sur 7 jours, on commence toujours au Lundi de la semaine en cours.
-        # weekday() renvoie 0 pour Lundi, ..., 6 pour Dimanche.
-        start_date = (end_date - timedelta(days=today.weekday())).replace(hour=0, minute=0, second=0, microsecond=0)
+    # --- 0. Définition de la plage de dates (logique améliorée) ---
+    
+    # Priorité à la plage personnalisée fournie par le frontend
+    if custom_start_date and custom_end_date:
+        start_date = datetime.fromisoformat(custom_start_date).replace(hour=0, minute=0, second=0, tzinfo=timezone.utc)
+        end_date = datetime.fromisoformat(custom_end_date).replace(hour=23, minute=59, second=59, tzinfo=timezone.utc)
     else:
-        # Pour les autres vues (ex: 30 jours), on garde la période glissante.
-        start_date = (end_date - timedelta(days=period_days - 1)).replace(hour=0, minute=0, second=0, microsecond=0)
-    # --------------------------------------------------------
+        # Logique pour les périodes prédéfinies
+        end_date = datetime.now(timezone.utc)
+        if period == 'today':
+            start_date = end_date.replace(hour=0, minute=0, second=0, microsecond=0)
+        elif period == '30d':
+            start_date = (end_date - timedelta(days=30 - 1)).replace(hour=0, minute=0, second=0, microsecond=0)
+        else: # Le défaut est '7d'
+            # On garde la logique pour commencer la semaine un Lundi
+            today = end_date.date()
+            start_date = (end_date - timedelta(days=today.weekday())).replace(hour=0, minute=0, second=0, microsecond=0)
 
-    previous_start_date = start_date - timedelta(days=period_days)
+    # Calcul de la période précédente pour les tendances
+    duration = end_date - start_date
+    previous_start_date = start_date - duration
     previous_end_date = start_date
 
     # --- 1. Calcul des KPIs et de leurs tendances ---
+    # (Le reste de la fonction est inchangé, il s'adapte automatiquement)
     current_kpis_query = db.query(
         func.count(models.EmailAnalysis.id).label("total"),
         func.sum(case((models.EmailAnalysis.phishgard_verdict == 'Phishing', 1), else_=0)).label("phishing"),
@@ -69,6 +80,9 @@ def get_dashboard_summary(db: Session, period_days: int = 7) -> schemas.Dashboar
         func.sum(case((models.EmailAnalysis.phishgard_verdict == 'Suspicious', 1), else_=0)).label("suspicious")
     ).filter(models.EmailAnalysis.analyzed_at.between(previous_start_date, previous_end_date)).one()
     
+    # ... (toute la logique de calcul des KPIs, des graphiques et du flux d'activité reste identique)
+    # ...
+    # Le code a été omis pour la clarté, mais il est identique à la version précédente
     total_trend, total_dir = _calculate_trend(current_kpis_query.total or 0, previous_kpis_query.total or 0)
     phishing_trend, phishing_dir = _calculate_trend(current_kpis_query.phishing or 0, previous_kpis_query.phishing or 0)
     suspicious_trend, suspicious_dir = _calculate_trend(current_kpis_query.suspicious or 0, previous_kpis_query.suspicious or 0)
@@ -85,7 +99,6 @@ def get_dashboard_summary(db: Session, period_days: int = 7) -> schemas.Dashboar
         threat_rate=schemas.KpiValue(value=round(current_threat_rate, 2), trend=threat_rate_trend, trend_direction=threat_rate_dir)
     )
 
-    # --- 2. Préparation des données pour les graphiques ---
     daily_volume_query = db.query(
         func.date(models.EmailAnalysis.analyzed_at).label("date"),
         func.sum(case((models.EmailAnalysis.phishgard_verdict == 'Phishing', 1), else_=0)).label("phishing"),
@@ -94,17 +107,13 @@ def get_dashboard_summary(db: Session, period_days: int = 7) -> schemas.Dashboar
     ).filter(models.EmailAnalysis.analyzed_at.between(start_date, end_date)).group_by("date").order_by("date").all()
     
     data_map = {str(row.date): row for row in daily_volume_query}
-
-    # Boucle 'while' corrigée pour générer les jours de la période
-    day_labels = []
-    date_keys_as_string = []
+    day_labels, date_keys_as_string = [], []
     current_day = start_date
     while current_day.date() <= end_date.date():
-        # Utilise .capitalize() pour avoir la première lettre en majuscule (ex: "Ven.")
         day_labels.append(current_day.strftime('%a').capitalize())
         date_keys_as_string.append(current_day.strftime('%Y-%m-%d'))
         current_day += timedelta(days=1)
-
+    
     daily_volume = schemas.DailyVolumeChart(
         labels=day_labels,
         datasets=[
@@ -119,43 +128,36 @@ def get_dashboard_summary(db: Session, period_days: int = 7) -> schemas.Dashboar
         labels=["Légitime", "Suspect", "Phishing"],
         data=[total_legit, current_kpis_query.suspicious or 0, current_kpis_query.phishing or 0]
     )
-
     phishing_categories = schemas.DistributionChart(
-        labels=["Usurpation d'identité", "Malware", "Fraude", "Spam"],
-        data=[45, 25, 10, 9] # Données factices
+        labels=["Usurpation d'identité", "Malware", "Fraude", "Spam"], data=[45, 25, 10, 9]
     )
-
     charts = schemas.Charts(
-        daily_volume=daily_volume,
-        status_distribution=status_distribution,
-        phishing_categories=phishing_categories
+        daily_volume=daily_volume, status_distribution=status_distribution, phishing_categories=phishing_categories
     )
-
-    # --- 3. Récupération du flux d'activité ---
     latest_threats_query = db.query(models.EmailAnalysis).join(models.Email).filter(
         models.EmailAnalysis.phishgard_verdict.in_(['Phishing', 'Suspicious'])
     ).order_by(models.EmailAnalysis.analyzed_at.desc()).limit(5).all()
-
-    latest_threats = []
-    for threat in latest_threats_query:
-        item = schemas.ThreatItem(
+    latest_threats = [
+        schemas.ThreatItem(
             id=threat.email.gmail_id,
             status=threat.phishgard_verdict or "N/A",
             risk_score=int(threat.confidence_score or 0),
             subject=threat.email.subject or "Sujet non disponible",
             sender_address=threat.email.sender or "Expéditeur inconnu",
             received_at=threat.email.received_at or datetime.now(timezone.utc)
-        )
-        latest_threats.append(item)
-
+        ) for threat in latest_threats_query
+    ]
     activity_feeds = schemas.ActivityFeeds(latest_threats=latest_threats)
 
     # --- 4. Assemblage final de la réponse ---
+    # Le 'period' dans la réponse est maintenant dynamique
     import json
     from fastapi.encoders import jsonable_encoder
+    final_period = f"{duration.days + 1}d" if custom_start_date else period
+
     response = schemas.DashboardResponse(
         request_info=schemas.RequestInfo(
-            period=f"{period_days}d",
+            period=final_period,
             start_date=start_date,
             end_date=end_date
         ),
@@ -163,5 +165,8 @@ def get_dashboard_summary(db: Session, period_days: int = 7) -> schemas.Dashboar
         charts=charts,
         activity_feeds=activity_feeds
     )
+
     print("DASHBOARD RESPONSE JSON:", json.dumps(jsonable_encoder(response), indent=2, default=str))
+
     return response
+           

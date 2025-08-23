@@ -104,3 +104,31 @@ export async function getDashboardData(period = 7) {
         throw error;
     }
 }
+
+/**
+ * NOUVEAU: Récupère les données du dashboard pour une plage de dates spécifique.
+ * @param {string} startDate - Date de début au format YYYY-MM-DD
+ * @param {string} endDate - Date de fin au format YYYY-MM-DD
+ * @returns {Promise<Object>}
+ */
+export async function getDashboardDataByDateRange(startDate, endDate) {
+    // Note: l'endpoint /api/dashboard/summary devra être modifié côté backend
+    // pour accepter start_date et end_date.
+    const url = `${API_BASE_URL}/api/dashboard/summary?start_date=${startDate}&end_date=${endDate}`;
+    console.log(`Fetching REAL data from: ${url}`);
+    
+    try {
+        const response = await fetch(url);
+        
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({ detail: `Erreur HTTP ${response.status}` }));
+            throw new Error(errorData.detail);
+        }
+        
+        return await response.json();
+
+    } catch (error) {
+        console.error("Erreur lors de la récupération des données du tableau de bord:", error);
+        throw error;
+    }
+}

@@ -6,12 +6,31 @@ from dotenv import load_dotenv
 # Charger les variables d'environnement du fichier .env
 load_dotenv()
 
+
+# --- Définition des chemins de base ---
+# BASE_DIR est le dossier racine du projet (PhishGard-AI/)
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# CONFIG_DIR est ce dossier (/config)
+CONFIG_DIR = os.path.join(BASE_DIR, 'config')
+# On crée un dossier dédié pour les secrets et les tokens générés
+SECRETS_DIR = os.path.join(CONFIG_DIR, '.secrets')
+
+
 # --- Configuration Gmail ---
-# Porté des permissions pour l'API Gmail
-GMAIL_SCOPES = ['https://www.googleapis.com/auth/gmail.modify']
-# Chemin vers les fichiers de credentials
-CREDENTIALS_FILE = 'client_secret.json'
-TOKEN_FILE = 'token.json'
+# Portée des permissions pour l'API Gmail (on remet toutes celles nécessaires)
+GMAIL_SCOPES = [
+    'https://www.googleapis.com/auth/gmail.readonly',
+    'https://www.googleapis.com/auth/gmail.labels',
+    'https://www.googleapis.com/auth/gmail.modify'
+]
+
+# Chemin vers le fichier credentials téléchargé depuis Google Cloud
+# Il doit être placé dans le dossier /config
+CREDENTIALS_FILE = os.path.join(CONFIG_DIR, 'client_secret.json') # <== Assurez-vous que le vôtre s'appelle bien comme ça
+
+# Chemin vers le fichier token qui sera généré dynamiquement
+# Il sera stocké dans /config/.secrets/ pour éviter le reload du serveur
+TOKEN_FILE = os.path.join(SECRETS_DIR, 'token.json')
 
 # --- Configuration du Modèle LLM ---
 # Nom du modèle à utiliser pour l'analyse

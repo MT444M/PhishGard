@@ -1,3 +1,14 @@
+def parse_ssl_date(date_str):
+    """Parse une date SSL au format 'Aug 10 13:39:42 2025 GMT' ou retourne la chaîne brute si échec."""
+    from datetime import datetime
+    try:
+        return datetime.strptime(date_str, '%b %d %H:%M:%S %Y %Z')
+    except ValueError:
+        try:
+            # Essai sans timezone
+            return datetime.strptime(date_str.replace(' GMT', ''), '%b %d %H:%M:%S %Y')
+        except ValueError:
+            return date_str
 # PhishGard-AI/analysis/osint_enricher.py
 
 import requests
@@ -142,7 +153,11 @@ def enrich_with_osint_data(parsed_headers):
     # --- 3. Analyse des Domaines ---
     for domain in domains_to_analyze:
         print(f"  [OSINT] Analyse du domaine : {domain}")
-        osint_results["domain_analysis"][domain] = get_domain_age_info(domain)
+        domain_info = get_domain_age_info(domain)
+        # Correction : si le domaine_info contient une date SSL, on la parse
+        if domain_info and isinstance(domain_info, dict) and "ssl_expiry" in domain_info:
+            domain_info["ssl_expiry_parsed"] = parse_ssl_date(domain_info["ssl_expiry"])
+        osint_results["domain_analysis"][domain] = domain_info
 
     # --- 4. CORRECTION 1: Exécution de l'Analyse de Chemin ---
     received_path = parsed_headers.get("received_path", [])

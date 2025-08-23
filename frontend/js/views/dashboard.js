@@ -1,8 +1,10 @@
-import { getDashboardData } from '../api.js';
+import { getDashboardData, getDashboardDataByDateRange } from '../api.js';
 
 // --- Constantes et références ---
 const dashboardView = document.getElementById('dashboard-view');
-const periodSelect = document.getElementById('dashboard-period-select');
+const dateButtonContainer = document.querySelector('.date-filter-group');
+const dateButtons = document.querySelectorAll('.date-btn');
+const datePickerInput = document.getElementById('dashboard-date-picker');
 
 // Références pour les graphiques afin de les détruire avant de les redessiner
 let emailsByStatusChart = null;
@@ -161,61 +163,89 @@ function renderLatestThreats(threats) {
 // --- Fonctions de contrôle ---
 
 /**
- * Met à jour toute la vue du dashboard avec de nouvelles données.
+ * Met à jour la vue avec une période en jours (pour les boutons).
  * @param {number} period - La période en jours.
  */
-async function updateDashboardView(period = 7) {
-    // Affiche un état de chargement
+async function updateDashboardWithPeriod(period = 7) {
     dashboardView.classList.add('loading');
-
     try {
         const data = await getDashboardData(period);
-        
-        // Met à jour chaque section avec les nouvelles données
         renderKPIs(data.kpis);
         renderCharts(data.charts);
         renderLatestThreats(data.activity_feeds.latest_threats);
-
     } catch (error) {
-        // En cas d'erreur, on pourrait afficher un message dans l'UI
         console.error("Échec de la mise à jour du tableau de bord:", error);
     } finally {
-        // Retire l'état de chargement
         dashboardView.classList.remove('loading');
     }
 }
 
+/**
+ * NOUVEAU: Met à jour la vue avec une plage de dates (pour le calendrier).
+ */
+async function updateDashboardWithDateRange(startDate, endDate) {
+    dashboardView.classList.add('loading');
+    try {
+        // 2. Appelle la nouvelle fonction de l'API
+        const data = await getDashboardDataByDateRange(startDate, endDate);
+        renderKPIs(data.kpis);
+        renderCharts(data.charts);
+        renderLatestThreats(data.activity_feeds.latest_threats);
+    } catch (error) {
+        console.error("Échec de la mise à jour du tableau de bord avec la plage de dates:", error);
+    } finally {
+        dashboardView.classList.remove('loading');
+    }
+}
 
 /**
  * Fonction d'initialisation de la vue du tableau de bord.
  * S'exécute une seule fois lorsque la vue est affichée.
  */
+// js/views/dashboard.js
+
+/**
+ * Fonction d'initialisation de la vue du tableau de bord.
+ */
 export function initDashboardView() {
     console.log("Dashboard view initialized");
-    
-    // Ajoute un écouteur d'événement sur le sélecteur de période
-    periodSelect.addEventListener('change', (event) => {
-        const selectedValue = event.target.value; // ex: "7d", "30d", "today"
-        let periodInDays;
 
-        // Logique améliorée pour convertir la sélection en nombre de jours
-        switch (selectedValue) {
-            case '30d':
-                periodInDays = 30;
-                break;
-            case 'today':
-                periodInDays = 1; // "Aujourd'hui" correspond à une période de 1 jour
-                break;
-            case '7d':
-            default:
-                periodInDays = 7;
-                break;
-        }
+    let datePicker;
+
+    // --- Gestion des clics sur les boutons ---
+    dateButtonContainer.addEventListener('click', (event) => {
+        const clickedButton = event.target.closest('.date-btn');
+        if (!clickedButton) return;
+
+        dateButtons.forEach(btn => btn.classList.remove('active'));
+        clickedButton.classList.add('active');
+
+        // On récupère directement la chaîne de caractères (7d, 30d, etc.)
+        const period = clickedButton.dataset.period;
         
-        console.log(`Période changée. Appel de l'API pour ${periodInDays} jour(s).`);
-        updateDashboardView(periodInDays);
+        // On appelle la mise à jour avec cette chaîne de caractères
+        updateDashboardWithPeriod(period);
+        
+        if (datePicker) {
+            datePicker.clear();
+        }
     });
-    
-    // Charge les données initiales pour la période par défaut (7 jours)
-    updateDashboardView(7);
+
+    // --- Initialisation de Flatpickr pour le calendrier ---
+    datePicker = flatpickr(datePickerInput, {
+        mode: "range",
+        dateFormat: "Y-m-d",
+        onClose: (selectedDates) => {
+            if (selectedDates.length === 2) {
+                dateButtons.forEach(btn => btn.classList.remove('active'));
+                const startDate = selectedDates[0].toISOString().split('T')[0];
+                const endDate = selectedDates[1].toISOString().split('T')[0];
+                updateDashboardWithDateRange(startDate, endDate);
+            }
+        }
+    });
+
+    // --- Chargement initial ---
+    // On met à jour l'attribut data-period pour correspondre au backend
+    document.querySelector('.date-btn[data-period="7"]').click();
 }

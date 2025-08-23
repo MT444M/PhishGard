@@ -10,12 +10,14 @@ from dashboard.schemas import DashboardResponse
 
 from pydantic import BaseModel, Field
 import json
+from typing import Optional 
 import os
 
 # --- Import de vos modules d'analyse ---
 # Nous ajustons les imports pour qu'ils fonctionnent depuis le dossier backend/
 from core.email_orchestrator import EmailOrchestrator
 from core.url_orchestrator import URLOrchestrator
+from core.header_orchestrator import HeaderOrchestrator
 from core import email_client # On garde l'authentification
 
 from database import crud, models
@@ -58,6 +60,11 @@ class URLAnalyzeRequest(BaseModel):
 class EmailAnalyzeRequest(BaseModel):
     # Pour l'instant on se base sur l'ID, on pourra ajouter le contenu brut plus tard
     email_id: str = Field(..., example="197640cc612987c5")
+
+class HeaderAnalyzeRequest(BaseModel):
+    raw_header: str = Field(..., example="Received: from mail-sor-f69.google.com (mail-sor-f69.google.com. [209.85.220.69])\n by mx.google.com ...")
+
+
 
 
 # ==============================================================================
@@ -125,11 +132,12 @@ def get_email_list():
     
 
 
-@app.post("/api/analyze/email")
+@app.post("/api/analyze/email") 
 def analyze_email(request: EmailAnalyzeRequest, db: Session = Depends(get_db)):
     """
     Analyse un email complet en utilisant son ID.
     Vérifie le cache en BDD et sauvegarde le nouveau résultat.
+    et applique les libellés appropriés sur Gmail.
     """
     if not gmail_service:
         raise HTTPException(status_code=503, detail="Service Gmail non disponible.")
@@ -144,8 +152,8 @@ def analyze_email(request: EmailAnalyzeRequest, db: Session = Depends(get_db)):
         # --- MODIFIER L'INSTANCIATION DE L'ORCHESTRATEUR ---
         # On l'instancie ici, en lui passant la session de BDD de la requête
         email_orchestrator = EmailOrchestrator(db=db)
-        
-        final_report = email_orchestrator.run_full_analysis(email_data)
+
+        final_report = email_orchestrator.run_full_analysis(email_data, gmail_service=gmail_service)
 
         return final_report
     except Exception as e:
@@ -190,19 +198,50 @@ def get_url_prediction(request: URLAnalyzeRequest):
 # -----------------------------------------------------------------------------
 # On utilise `response_model` pour garantir que la sortie de l'API correspondra au schéma
 @app.get("/api/dashboard/summary", response_model=DashboardResponse)
-def get_dashboard_data(period: int = 7, db: Session = Depends(get_db)):
+def get_dashboard_data(
+    db: Session = Depends(get_db),
+    period: str = "7d", # On garde une valeur par défaut
+    start_date: Optional[str] = None, # Date de début personnalisée
+    end_date: Optional[str] = None # Date de fin personnalisée
+):
     """
     Endpoint principal pour le dashboard.
-    Récupère un résumé de toutes les métriques d'analyse.
+    Accepte une période prédéfinie ('today', '7d', '30d') ou une plage de dates personnalisée.
     """
     try:
-        # La fonction `get_dashboard_summary` devra maintenant renvoyer
-        # un objet qui correspond à la structure de DashboardResponse.
-        summary_data = dashboard_service.get_dashboard_summary(db, period_days=period)
+        # On passe tous les paramètres au service, qui contiendra la logique
+        summary_data = dashboard_service.get_dashboard_summary(
+            db=db,
+            period=period,
+            custom_start_date=start_date,
+            custom_end_date=end_date
+        )
         return summary_data
     except Exception as e:
-        print(f"Erreur lors de la récupération des données du tableau de bord: {e}")
+        print(f"Erreur lors de la génération du résumé du dashboard: {e}")
+        raise HTTPException(status_code=500, detail="Erreur interne du serveur.")
+    
+
+# -----------------------------------------------------------------------------
+# ------ Nouveaux Endpoints pour l'Analyse des En-têtes -------
+# -----------------------------------------------------------------------------
+@app.post("/api/analyze/header")
+def analyze_raw_header(request: HeaderAnalyzeRequest):
+    """
+    Analyse un en-tête d'e-mail brut fourni dans le corps de la requête.
+    """
+    try:
+        # On instancie notre nouvel orchestrateur
+        header_orchestrator = HeaderOrchestrator()
+        final_report = header_orchestrator.run_header_analysis(request.raw_header)
+        return final_report
+    except Exception as e:
+        print(f"Erreur lors de l'analyse du header brut: {e}")
+        # Pour le débogage, il peut être utile d'imprimer l'exception
+        import traceback
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"Une erreur interne est survenue: {str(e)}")
+
 
 
 # ==============================================================================

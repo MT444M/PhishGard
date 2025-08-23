@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PhishGard</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/utilities.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -104,12 +105,14 @@
                 <div id="dashboard-view" class="view-container hidden">
                     <div class="dashboard-toolbar">
                         <h2 class="view-title">Tableau de Bord</h2>
-                        <div class="date-filter">
-                            <select id="dashboard-period-select">
-                                <option value="7d">7 derniers jours</option>
-                                <option value="30d">30 derniers jours</option>
-                                <option value="today">Aujourd'hui</option>
-                            </select>
+                        <div class="date-filter-group">
+                            <button class="date-btn active" data-period="7d">7 jours</button>
+                            <button class="date-btn" data-period="30d">30 jours</button>
+                            <button class="date-btn" data-period="today">Aujourd'hui</button>
+                            
+                            <div class="date-picker-wrapper">
+                                <input type="text" id="dashboard-date-picker" placeholder="Plage personnalisée">
+                            </div>
                         </div>
                     </div>
 

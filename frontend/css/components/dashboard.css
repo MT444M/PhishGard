@@ -167,3 +167,46 @@
     color: #c0392b; /* Rouge */
     background-color: rgba(192, 57, 43, 0.1);
 }
+
+
+/* --- Styles pour le nouveau groupe de filtres de date --- */
+
+.date-filter-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem; /* Espace entre les boutons */
+}
+
+.date-btn {
+    padding: 0.5rem 1rem;
+    border: 1px solid #ddd;
+    background-color: #fff;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+/* Style du bouton actif */
+.date-btn.active {
+    background-color: #3498db; /* Couleur bleue de l'interface */
+    color: #fff;
+    border-color: #3498db;
+}
+
+.date-btn:not(.active):hover {
+    background-color: #f8f9fa;
+    border-color: #ccc;
+}
+
+/* Conteneur pour le calendrier */
+.date-picker-wrapper {
+    position: relative;
+}
+
+#dashboard-date-picker {
+    padding: 0.5rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    width: 220px; /* Largeur du champ de date */
+}

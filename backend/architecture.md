@@ -10,6 +10,12 @@ PhishGard-AI/
 │   ├── email_orchestrator.py # Le "cerveau" qui organise les analyses d'un e-mail 
 │   └── url_orchestrator.py # Le "cerveau" qui organise les analyses d'une URL et  l'analyse contextuelle
     └── final_aggregator.py.    # la fusion des score de prediction
+    
+    dashboard/
+    ├── __init__.py
+    ├── dashboard_service.py        # Logique principale du tableau de bord
+    └── schemas.py                   # Schéma de données pour le tableau de bord
+
 
 ├── database/                  
 │   ├── __init__.py
