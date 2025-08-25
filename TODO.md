@@ -29,6 +29,8 @@ Liste des tâches à faire :
 
 
 // python -m http.server 8080
+// sudo -u postgres psql
+
 # remove WebsitePhishingDetection from Github
 
 

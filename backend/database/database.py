@@ -8,12 +8,13 @@ from sqlalchemy.orm import sessionmaker
 # URL de connexion pour SQLite. Le fichier phishgard.db sera créé à la racine.
 # POUR LA PRODUCTION avec PostgreSQL, la ligne ressemblerait à :
 # DATABASE_URL = "postgresql://user:password@postgresserver/db"
-DATABASE_URL = "sqlite:///./phishgard.db"
+# DATABASE_URL = "sqlite:///./phishgard.db"
+DATABASE_URL = "postgresql://phishgard_user:password@localhost:5432/phishgard_db"
 
 engine = create_engine(
-    DATABASE_URL, connect_args={"check_same_thread": False} # check_same_thread est nécessaire pour SQLite
+    DATABASE_URL # check_same_thread est nécessaire pour SQLite
 )
 
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine) # permet de créer des sessions en contrôlant la transaction, et en évitant les problèmes de concurrence.
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()

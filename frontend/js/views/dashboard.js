@@ -222,7 +222,9 @@ export function initDashboardView() {
 
         // On récupère directement la chaîne de caractères (7d, 30d, etc.)
         const period = clickedButton.dataset.period;
-        
+        // debug
+        console.log("Selected period:", period);
+
         // On appelle la mise à jour avec cette chaîne de caractères
         updateDashboardWithPeriod(period);
         

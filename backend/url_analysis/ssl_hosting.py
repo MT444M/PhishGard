@@ -7,6 +7,25 @@ from datetime import datetime, timezone
 from config import settings
 API_TOKEN = settings.IPINFO_API_KEY
 
+def _parse_ssl_date(date_str: str) -> datetime:
+    """
+    Parses SSL date strings, handling potential whitespace issues and missing timezones.
+    Example format: 'Jun  1 00:00:00 2025 GMT'
+    """
+    # Normalize whitespace to handle cases like 'Jun  1' vs 'Jun 10'
+    normalized_date_str = " ".join(date_str.split())
+    try:
+        # First, try parsing with timezone
+        return datetime.strptime(normalized_date_str, '%b %d %H:%M:%S %Y %Z')
+    except ValueError:
+        # If that fails, try parsing without timezone
+        # This handles cases where TZ is missing or not recognized
+        try:
+            return datetime.strptime(normalized_date_str, '%b %d %H:%M:%S %Y')
+        except ValueError as e:
+            # If both fail, raise an error to avoid continuing with a bad date
+            raise ValueError(f"Could not parse date: {date_str}") from e
+
 def format_domain_age(age_days: int) -> str:
     """
     Converts domain age in days to a human-readable format: years, months, days.
@@ -41,8 +60,8 @@ def get_ssl_info(domain: str, port: int = 443, timeout: int = 5) -> dict:
         return {"error": str(e)}
     
     # Parse the certificate validity dates and make them timezone-aware.
-    not_before = datetime.strptime(cert['notBefore'], '%b %d %H:%M:%S %Y %Z').replace(tzinfo=timezone.utc)
-    not_after = datetime.strptime(cert['notAfter'], '%b %d %H:%M:%S %Y %Z').replace(tzinfo=timezone.utc)
+    not_before = _parse_ssl_date(cert['notBefore']).replace(tzinfo=timezone.utc)
+    not_after = _parse_ssl_date(cert['notAfter']).replace(tzinfo=timezone.utc)
     days_valid = (not_after - datetime.now(timezone.utc)).days
     validity_period = format_domain_age(days_valid)
     
@@ -174,7 +193,7 @@ def test_ssl_info(domain: str):
     for key, value in basic_info.items():
         print(f"  {key}: {value}")
     
-    print("\n" + "=" * 50)
+    print("\n" + "=" * 50 + "\n")
     
     # Test étendu
     extended_info = get_extended_ssl_info(domain)
