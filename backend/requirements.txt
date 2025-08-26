@@ -1,13 +1,18 @@
 # PhishGard-AI/requirements.txt
 
 # Core
-google-api-python-client
-google-auth-oauthlib
-google-auth-httplib2
+google-api-python-client  # Pour interagir avec l'API Gmail
+google-auth-oauthlib  # Pour l'authentification avec les API Google
+google-auth-httplib2  # Pour l'authentification avec les API Google
 python-dotenv         # Pour gérer les variables d'environnement (.env)
+cryptography          # Pour le chiffrement des tokens
+
+# Auth
+python-jose[cryptography] # Pour les tokens JWT
+passlib[bcrypt]           # Pour le hachage (bonne pratique)
 
 # LLM
-transformers
+transformers  # Pour les modèles de langage
 torch
 
 # OSINT

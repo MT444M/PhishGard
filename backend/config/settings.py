@@ -16,21 +16,53 @@ CONFIG_DIR = os.path.join(BASE_DIR, 'config')
 SECRETS_DIR = os.path.join(CONFIG_DIR, '.secrets')
 
 
+# --- Configuration OAuth 2.0 Google ---
+# IMPORTANT : Vous devez créer des identifiants OAuth 2.0 pour une "Application Web"
+# dans la console Google Cloud (https://console.cloud.google.com/apis/credentials)
+# et ajouter http://localhost:8000/api/auth/callback comme URI de redirection autorisé.
+GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID", "YOUR_GOOGLE_CLIENT_ID")
+GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET", "YOUR_GOOGLE_CLIENT_SECRET")
+GOOGLE_REDIRECT_URI = "http://localhost:8000/api/auth/callback"
+GOOGLE_TOKEN_URI = "https://oauth2.googleapis.com/token"
+
+
+
+# --- Configuration de l'application Frontend ---
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5500")
+
+
+
+# --- Configuration du chiffrement ---
+# Clé pour chiffrer/déchiffrer les tokens OAuth en base de données.
+# Générez une clé sécurisée UNE SEULE FOIS avec la commande :
+# python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+# Et stockez-la dans votre fichier .env
+FERNET_KEY = os.getenv("FERNET_KEY")
+
+# --- Configuration JWT (JSON Web Token) ---
+# Clé secrète pour signer les JWT. À garder absolument secrète.
+# Générez une clé avec : openssl rand -hex 32
+JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "a_very_secret_key_that_should_be_in_env_file")
+JWT_ALGORITHM = "HS256"
+JWT_ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 # 24 heures
+
+
 # --- Configuration Gmail ---
 # Portée des permissions pour l'API Gmail (on remet toutes celles nécessaires)
 GMAIL_SCOPES = [
+    'openid',
     'https://www.googleapis.com/auth/gmail.readonly',
     'https://www.googleapis.com/auth/gmail.labels',
-    'https://www.googleapis.com/auth/gmail.modify'
+    'https://www.googleapis.com/auth/gmail.modify',
+    'https://www.googleapis.com/auth/userinfo.email', # Pour récupérer l'email de l'utilisateur
+    'https://www.googleapis.com/auth/userinfo.profile' # Pour récupérer le profil (et google_id)
 ]
 
 # Chemin vers le fichier credentials téléchargé depuis Google Cloud
 # Il doit être placé dans le dossier /config
-CREDENTIALS_FILE = os.path.join(CONFIG_DIR, 'client_secret.json') # <== Assurez-vous que le vôtre s'appelle bien comme ça
 
 # Chemin vers le fichier token qui sera généré dynamiquement
 # Il sera stocké dans /config/.secrets/ pour éviter le reload du serveur
-TOKEN_FILE = os.path.join(SECRETS_DIR, 'token.json')
 
 # --- Configuration du Modèle LLM ---
 # Nom du modèle à utiliser pour l'analyse

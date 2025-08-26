@@ -50,17 +50,22 @@
                     <div class="stat-trend negative">▼ -2%</div>
                 </div>
             </div>
-            <div class="user-menu-wrapper">
-                <button class="user-menu-button" id="user-menu-btn">
+           <div class="user-menu-wrapper">
+                <button class="user-menu-button" id="user-menu-btn" style="display: none;">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                    <span>admin@company.com</span>
+                    <span>email.utilisateur@gmail.com</span>
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                 </button>
                 <div class="dropdown-menu" id="user-dropdown-menu">
-                    <a href="#" class="dropdown-item">Mon Compte</a>
                     <a href="#/settings" class="dropdown-item">Paramètres</a>
                     <div class="dropdown-divider"></div>
                     <a href="#" class="dropdown-item logout">Déconnexion</a>
+                </div>
+
+                <div id="login-btn-container" style="display: none;">
+                    <a href="http://localhost:8000/api/auth/login" class="button button-primary">
+                        Se connecter avec Google
+                    </a>
                 </div>
             </div>
         </div>

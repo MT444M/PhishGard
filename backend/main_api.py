@@ -21,7 +21,11 @@ from core.header_orchestrator import HeaderOrchestrator
 from core import email_client # On garde l'authentification
 
 from database import crud, models
-from database.database import SessionLocal, engine
+from database.database import SessionLocal, engine, get_db
+
+from auth import auth_router, auth_service # <== AJOUTER auth_service
+from googleapiclient.discovery import Resource # <== AJOUTER pour le type hinting
+
 
 # ==============================================================================
 # 0. CRÉATION DES TABLES DE LA BASE DE DONNÉES
@@ -43,11 +47,13 @@ app = FastAPI(
 # puisse communiquer avec votre backend.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # En production, vous devriez restreindre à l'URL de votre frontend
+    allow_origins=["http://127.0.0.1:8080", "http://localhost:8080"],  # En production, vous devriez restreindre à l'URL de votre frontend
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(auth_router.router)
 
 # ==============================================================================
 # 2. MODÈLES DE DONNÉES (Pydantic)
@@ -65,27 +71,17 @@ class HeaderAnalyzeRequest(BaseModel):
     raw_header: str = Field(..., example="Received: from mail-sor-f69.google.com (mail-sor-f69.google.com. [209.85.220.69])\n by mx.google.com ...")
 
 
+# C'est une bonne pratique pour ne pas renvoyer de données sensibles comme les tokens
+class UserResponse(BaseModel):
+    email: str
+    google_id: str
+
+    class Config:
+        orm_mode = True # Permet à Pydantic de lire les données depuis un objet SQLAlchemy
 
 
 # ==============================================================================
-# 3. GESTION DE LA SESSION DE BASE DE DONNÉES
-# ==============================================================================
-# Dépendance FastAPI pour obtenir une session de BDD par requête
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-# --- SUPPRIMER L'INITIALISATION GLOBALE DE L'ORCHESTRATEUR ---
-# email_orchestrator = EmailOrchestrator() # <== SUPPRIMER CETTE LIGNE
-gmail_service = email_client.authenticate_gmail()
-
-
-
-# ==============================================================================
-# 4. DÉFINITION DES ENDPOINTS DE L'API
+# 3. DÉFINITION DES ENDPOINTS DE L'API
 # ==============================================================================
 # Endpoint racine pour vérifier que l'API est en ligne
 @app.get("/")
@@ -97,11 +93,24 @@ def read_root():
     return {"status": "PhishGard-AI API est en ligne"}
 
 
+# --- AJOUTE CE NOUVEL ENDPOINT ---
+@app.get("/api/users/me", response_model=UserResponse)
+def get_logged_in_user(current_user: models.User = Depends(auth_service.get_current_user)):
+    """
+    Endpoint protégé qui renvoie les informations de l'utilisateur actuellement connecté.
+    La dépendance `get_current_user` gère toute la validation du cookie JWT.
+    """
+    return current_user
+
+
 
 @app.get("/api/emails")
-def get_email_list():
+def get_email_list(
+    current_user: models.User = Depends(auth_service.get_current_user),
+    gmail_service: Resource = Depends(auth_service.get_gmail_service)
+):
     """
-    Endpoint pour récupérer la liste des emails depuis le service Gmail.
+    Endpoint SÉCURISÉ pour récupérer la liste des emails pour l'utilisateur connecté.
     """
     if not gmail_service:
         raise HTTPException(status_code=503, detail="Service Gmail non disponible.")
@@ -133,7 +142,12 @@ def get_email_list():
 
 
 @app.post("/api/analyze/email") 
-def analyze_email(request: EmailAnalyzeRequest, db: Session = Depends(get_db)):
+def analyze_email(
+    request: EmailAnalyzeRequest,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth_service.get_current_user),
+    gmail_service: Resource = Depends(auth_service.get_gmail_service)
+    ):
     """
     Analyse un email complet en utilisant son ID.
     Vérifie le cache en BDD et sauvegarde le nouveau résultat.
@@ -149,11 +163,11 @@ def analyze_email(request: EmailAnalyzeRequest, db: Session = Depends(get_db)):
         
         email_data = email_data_list[0]
         
-        # --- MODIFIER L'INSTANCIATION DE L'ORCHESTRATEUR ---
         # On l'instancie ici, en lui passant la session de BDD de la requête
         email_orchestrator = EmailOrchestrator(db=db)
 
-        final_report = email_orchestrator.run_full_analysis(email_data, gmail_service=gmail_service)
+         # On passe maintenant l'ID de l'utilisateur à l'orchestrateur
+        final_report = email_orchestrator.run_full_analysis(email_data, gmail_service=gmail_service, user_id=current_user.id)
 
         return final_report
     except Exception as e:
@@ -168,7 +182,7 @@ def analyze_email(request: EmailAnalyzeRequest, db: Session = Depends(get_db)):
 def get_url_contextual_analysis(request: URLAnalyzeRequest):
     """
     Endpoint pour l'analyse 'humaine'.
-    Récupère des informations contextuelles détaillées sur une URL (WHOIS, DNS, SSL...).
+    Récupère des informations contextuelles détaillées sur une URL (WHOIS, DNS, SSL...). 
     """
     try:
         orchestrator = URLOrchestrator(request.url)
@@ -245,7 +259,7 @@ def analyze_raw_header(request: HeaderAnalyzeRequest):
 
 
 # ==============================================================================
-# 5. DÉMARRAGE DU SERVEUR
+# 4. DÉMARRAGE DU SERVEUR
 # ==============================================================================
 if __name__ == "__main__":
     print("Démarrage du serveur PhishGard-AI sur http://127.0.0.1:8000")

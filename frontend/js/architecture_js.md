@@ -24,7 +24,7 @@ Je vous suggère de créer la structure suivante. Le dossier `utils` est une bon
      └─── /views
           |
           |─── inbox.js
-          |
+          |─── dashboard.js
           └─── analyzer_on_demand.js
 ```
 

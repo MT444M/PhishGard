@@ -39,7 +39,7 @@ class EmailOrchestrator:
         self.llm_analyzer_instance = llm_analyzer.LLMAnalyzer()
 
     # --- MÉTHODE D'ANALYSE ENTIÈREMENT MISE À JOUR ---
-    def run_full_analysis(self, email_data: dict, gmail_service):
+    def run_full_analysis(self, email_data: dict, gmail_service, user_id: str):
         """
         Exécute le pipeline d'analyse complet, avec vérification du cache
         et sauvegarde en base de données.
@@ -49,7 +49,7 @@ class EmailOrchestrator:
 
         # 1. VÉRIFICATION DU CACHE EN BASE DE DONNÉES
         print(f"[CACHE] Vérification de l'existence d'une analyse pour l'ID: {email_id}")
-        cached_analysis = crud.get_analysis_by_gmail_id(self.db, gmail_id=email_id)
+        cached_analysis = crud.get_analysis_by_gmail_id(self.db, gmail_id=email_id, user_id=user_id)
         if cached_analysis:
             print(f"      ... Analyse trouvée en cache. Retour du résultat existant.")
             # On reconstruit un rapport final à partir des données de la BDD
@@ -117,7 +117,8 @@ class EmailOrchestrator:
         crud.create_email_and_analysis(
             db=self.db,
             email_data=email_data,
-            analysis_report=final_report
+            analysis_report=final_report,
+            user_id=user_id
         )
         print("      ... Sauvegarde réussie.")
 
