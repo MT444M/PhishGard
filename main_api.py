@@ -1,6 +1,8 @@
 # backend/main_api.py
 
 import uvicorn
+import datetime
+import os
 from typing import Optional
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.staticfiles import StaticFiles
@@ -81,15 +83,22 @@ app.add_middleware(
     CORSMiddleware,
     # Pour la production, spécifiez les domaines exacts au lieu de "*"
     # "*" et allow_credentials=True sont incompatibles selon les navigateurs
-    allow_origins=[
-        "http://127.0.0.1:8000",
-        "http://localhost:8000", 
-        "https://phishgard.usts.ai",
-        # Ajoutez l'URL de votre instance Coolify
-        "https://hk8484gs8wgso4scw0ckcc8s",
-        "https://phishgard.coolify.io"
-    ],
-    allow_credentials=True,
+    # Temporairement accepter toutes les origines pour faciliter le débogage
+    # Une fois que l'application fonctionne correctement, remplacer "*" par les URLs spécifiques
+    allow_origins=["*"],
+    # IMPORTANT: allow_credentials=False est obligatoire quand allow_origins=["*"]
+    # sinon les navigateurs bloquent les requêtes CORS
+    allow_credentials=False,
+    # Voici les URLs spécifiques si vous souhaitez les réactiver plus tard avec allow_credentials=True:
+    # allow_origins=[
+    #    "http://127.0.0.1:8000",
+    #    "http://localhost:8000", 
+    #    "https://phishgard.usts.ai",
+    #    "https://hk8484gs8wgso4scw0ckcc8s",
+    #    "http://hk8484gs8wgso4scw0ckcc8s",  # Version non-HTTPS 
+    #    "https://phishgard.coolify.io"
+    # ],
+    # allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -139,6 +148,37 @@ def read_root():
     """Endpoint racine pour vérifier que l'API est en ligne"""
     logger.info("Endpoint racine appelé")
     return {"status": "PhishGard-AI API est en ligne"}
+
+@app.get("/health")
+def health_check():
+    """Endpoint de diagnostic pour vérifier l'état des services"""
+    logger.info("Healthcheck endpoint appelé")
+    
+    # Vérifier l'état de la base de données
+    db_status = "OK"
+    db_error = None
+    
+    try:
+        # Utiliser with engine.connect() pour éviter les problèmes de contexte
+        with engine.connect() as conn:
+            # Simple requête pour vérifier que la connexion fonctionne
+            conn.execute("SELECT 1")
+    except Exception as e:
+        db_status = "ERROR"
+        db_error = str(e)
+    
+    return {
+        "service": "PhishGard API",
+        "status": "UP",
+        "timestamp": datetime.datetime.now().isoformat(),
+        "database": {
+            "status": db_status,
+            "error": db_error,
+            "host": os.getenv("DB_HOST", "not set"),
+            "database": os.getenv("DB_NAME", "not set")
+        },
+        "environment": os.getenv("ENV", "development")
+    }
 
 # =============================================================================
 # ENDPOINTS GESTION UTILISATEUR
