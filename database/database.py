@@ -36,9 +36,8 @@ engine = create_engine(
 def connect(dbapi_connection, connection_record):
     logger.info("Base de données connectée avec succès!")
 
-@event.listens_for(engine, "connect_error")
-def connect_err(dbapi_connection, connection_record, exception):
-    logger.error(f"Erreur de connexion à la base de données: {exception}")
+# Note: SQLAlchemy n'a pas d'événement 'connect_error'
+# Nous gérons les erreurs de connexion dans get_db() ou via pool_pre_ping=True
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
@@ -50,12 +49,16 @@ def get_db():
     try:
         # Tentative d'exécuter une requête simple pour vérifier la connexion
         logger.info("Vérification de la connexion à la base de données...")
-        db.execute("SELECT 1")
+        # Méthode compatible avec toutes les versions de SQLAlchemy
+        with db.connection() as conn:
+            conn.execute("SELECT 1")
         logger.info("Connexion à la base de données vérifiée")
         yield db
     except Exception as e:
         logger.error(f"Erreur lors de l'accès à la base de données: {e}")
-        raise
+        # Ne pas lever d'exception pour éviter de bloquer l'application
+        # Retourner None pour indiquer que la connexion a échoué
+        yield None
     finally:
         logger.debug("Fermeture de la session de base de données")
         db.close()

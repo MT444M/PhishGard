@@ -38,24 +38,31 @@ from auth import auth_router, auth_service
 # CRÉATION DES TABLES DE LA BASE DE DONNÉES
 # =============================================================================
 # Cette ligne crée les tables définies dans `models.py` si elles n'existent pas
+# Tenter de se connecter à la base de données avec gestion des erreurs robuste
 try:
     # Essayer de se connecter à la base de données et de créer les tables
-    logger.info(f"Tentative de connexion à la base de données PostgreSQL sur {engine.url.host}:{engine.url.port}/{engine.url.database}")
-    # Vérifier que la connexion fonctionne
-    with engine.connect() as conn:
-        conn.execute("SELECT 1")
-        logger.info("Connexion à la base de données PostgreSQL établie avec succès")
-    
-    # Créer les tables
-    models.Base.metadata.create_all(bind=engine)
-    logger.info("Tables de base de données créées/vérifiées")
-except Exception as e:
-    logger.error(f"ERREUR CRITIQUE - Impossible de se connecter à la base de données: {e}")
-    # Afficher les détails de la configuration sans le mot de passe
     from database.database import DB_HOST, DB_PORT, DB_NAME, DB_USER
-    logger.error(f"Configuration de la base de données: hôte={DB_HOST}, port={DB_PORT}, base={DB_NAME}, utilisateur={DB_USER}")
-    # Ne pas planter l'application - on va juste signaler l'erreur
-    logger.warning("L'application continue mais certaines fonctionnalités pourraient ne pas marcher sans base de données")
+    logger.info(f"Tentative de connexion à la base de données PostgreSQL sur {DB_HOST}:{DB_PORT}/{DB_NAME} avec l'utilisateur {DB_USER}")
+    
+    # Vérifier que la connexion fonctionne en essayant une simple requête
+    # Cette partie peut échouer si la base de données n'est pas accessible
+    try:
+        with engine.connect() as conn:
+            # Utiliser une syntaxe compatible avec toutes les versions de SQLAlchemy
+            conn.exec_driver_sql("SELECT 1")
+            logger.info("Connexion à la base de données PostgreSQL établie avec succès")
+            
+        # Une fois la connexion confirmée, créer les tables
+        models.Base.metadata.create_all(bind=engine)
+        logger.info("Tables de base de données créées/vérifiées")
+    except Exception as e:
+        logger.error(f"Erreur lors de l'accès à la base de données: {e}")
+        logger.warning("L'application va démarrer, mais les fonctionnalités liées à la base de données ne seront pas disponibles")
+        
+# Capturer toutes les autres erreurs potentielles liées à la configuration de la BDD
+except Exception as e:
+    logger.error(f"ERREUR CRITIQUE - Problème avec la configuration de la base de données: {e}")
+    logger.warning("L'application va démarrer avec des fonctionnalités limitées")
 
 # =============================================================================
 # INITIALISATION DE L'APPLICATION FastAPI
