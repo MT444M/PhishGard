@@ -3,11 +3,14 @@
 import uvicorn
 import datetime
 import os
+import sys
+import multiprocessing
 from typing import Optional
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI, HTTPException, Depends, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
+from sqlalchemy import text
 from pydantic import BaseModel, Field
 from googleapiclient.discovery import Resource
 
@@ -150,7 +153,7 @@ def read_root():
     return {"status": "PhishGard-AI API est en ligne"}
 
 @app.get("/health")
-def health_check():
+def health_check(request: Request):
     """Endpoint de diagnostic pour vérifier l'état des services"""
     logger.info("Healthcheck endpoint appelé")
     
@@ -162,10 +165,23 @@ def health_check():
         # Utiliser with engine.connect() pour éviter les problèmes de contexte
         with engine.connect() as conn:
             # Simple requête pour vérifier que la connexion fonctionne
-            conn.execute("SELECT 1")
+            result = conn.execute(text("SELECT 1"))
     except Exception as e:
         db_status = "ERROR"
         db_error = str(e)
+    
+    # Récupérer des informations sur l'environnement
+    app_info = {
+        "hostname": os.uname().nodename if hasattr(os, 'uname') else "unknown",
+        "pid": os.getpid(),
+        "python_version": sys.version,
+        "workers": multiprocessing.cpu_count(),
+    }
+    
+    # Logger des informations complètes pour le débogage
+    logger.info(f"Health check called - DB status: {db_status}")
+    if db_error:
+        logger.error(f"Database error during health check: {db_error}")
     
     return {
         "service": "PhishGard API",
@@ -175,9 +191,14 @@ def health_check():
             "status": db_status,
             "error": db_error,
             "host": os.getenv("DB_HOST", "not set"),
-            "database": os.getenv("DB_NAME", "not set")
+            "port": os.getenv("DB_PORT", "not set"),
+            "database": os.getenv("DB_NAME", "not set"),
+            "user": os.getenv("DB_USER", "not set")
         },
-        "environment": os.getenv("ENV", "development")
+        "environment": os.getenv("ENV", "development"),
+        "app_info": app_info,
+        "listen_port": 8000,
+        "request_headers": {k: v for k, v in request.headers.items()}
     }
 
 # =============================================================================

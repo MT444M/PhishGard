@@ -50,5 +50,5 @@ ENV PORT=8000 \
     ENV="production"
 
 # Commande pour démarrer l'application en production
-# Utilise un port fixe 8000 pour éviter les problèmes de substitution de variables
-CMD ["gunicorn", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "-b", "0.0.0.0:8000", "main_api:app"]
+# Utilise un fichier de configuration explicite pour gunicorn
+CMD ["gunicorn", "--config", "gunicorn_config.py", "main_api:app"]
