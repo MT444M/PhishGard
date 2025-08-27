@@ -1,41 +1,40 @@
-# Dockerfile
+# Dockerfile mis à jour pour GPU
 
 # --- Étape 1: Build ---
-# Utilise une image Python complète pour installer les dépendances
-FROM python:3.11-slim as builder
+FROM nvidia/cuda:12.1.1-runtime-ubuntu22.04 as builder
 
-# Définit le répertoire de travail
+# Installe les dépendances système comme Python et pip
+RUN apt-get update && apt-get install -y \
+    python3.11 \
+    python3-pip \
+    python3.11-venv \
+    && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
-
-# Copie le fichier des dépendances
 COPY requirements.txt .
 
-# Installe les dépendances dans un environnement virtuel
-RUN python -m venv /opt/venv && \
+# Utilise python3.11 explicitement
+RUN python3.11 -m venv /opt/venv && \
     /opt/venv/bin/pip install --upgrade pip && \
     /opt/venv/bin/pip install --no-cache-dir -r requirements.txt
 
 # --- Étape 2: Production ---
-# Utilise une image plus légère pour l'exécution
-FROM python:3.11-slim
+FROM nvidia/cuda:12.1.1-runtime-ubuntu22.04
 
-# Définit le répertoire de travail
+# Installe python3.11 (nécessaire pour l'exécution)
+RUN apt-get update && apt-get install -y \
+    python3.11 \
+    && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
-
-# Copie l'environnement virtuel de l'étape de build
 COPY --from=builder /opt/venv /opt/venv
-
-# Copie le code de l'application
 COPY . .
-
-# Active l'environnement virtuel
 ENV PATH="/opt/venv/bin:$PATH"
 
-# Crée un utilisateur non-root pour des raisons de sécurité
 RUN useradd --create-home appuser
 USER appuser
 
-# Commande pour démarrer l'application en production
-# Coolify peut surcharger le port, mais c'est bien de l'exposer
 EXPOSE 8000
+# On ajoute la variable d'environnement pour que PyTorch voie le GPU
+ENV NVIDIA_VISIBLE_DEVICES=all
 CMD ["gunicorn", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "-b", "0.0.0.0:8000", "main_api:app"]
