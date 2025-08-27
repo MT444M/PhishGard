@@ -20,3 +20,14 @@ output/
 # Ignore log files
 *.log
 
+# Ignore database files
+*.sqlite
+*.db
+
+# ignore runtime files
+*.egg-info/
+dist/
+build/
+
+# ruff
+*.ruff_cache/

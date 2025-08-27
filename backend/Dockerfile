@@ -1,18 +1,41 @@
-# Use an official Python runtime as a parent image
-FROM python:3.11-slim
+# Dockerfile
 
-# Set the working directory in the container
+# --- Étape 1: Build ---
+# Utilise une image Python complète pour installer les dépendances
+FROM python:3.11-slim as builder
+
+# Définit le répertoire de travail
 WORKDIR /app
 
-# Copy the requirements file and install dependencies
+# Copie le fichier des dépendances
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the rest of the application code
+# Installe les dépendances dans un environnement virtuel
+RUN python -m venv /opt/venv && \
+    /opt/venv/bin/pip install --upgrade pip && \
+    /opt/venv/bin/pip install --no-cache-dir -r requirements.txt
+
+# --- Étape 2: Production ---
+# Utilise une image plus légère pour l'exécution
+FROM python:3.11-slim
+
+# Définit le répertoire de travail
+WORKDIR /app
+
+# Copie l'environnement virtuel de l'étape de build
+COPY --from=builder /opt/venv /opt/venv
+
+# Copie le code de l'application
 COPY . .
 
-# Expose the port the app runs on
-EXPOSE 8000
+# Active l'environnement virtuel
+ENV PATH="/opt/venv/bin:$PATH"
 
-# Run the application
+# Crée un utilisateur non-root pour des raisons de sécurité
+RUN useradd --create-home appuser
+USER appuser
+
+# Commande pour démarrer l'application en production
+# Coolify peut surcharger le port, mais c'est bien de l'exposer
+EXPOSE 8000
 CMD ["gunicorn", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "-b", "0.0.0.0:8000", "main_api:app"]
