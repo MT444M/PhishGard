@@ -35,5 +35,5 @@ fastapi
 gunicorn
 
 # database
-# "sqlalchemy[asyncio]" aiosqlite
+ "sqlalchemy[asyncio]" aiosqlite
 psycopg2-binary # pour postgresql
