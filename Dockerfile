@@ -40,12 +40,9 @@ EXPOSE 8000
 
 # Port configurable via variable d'environnement
 ENV PORT=8000 \
-    # Variables d'environnement pour la base de données Coolify
-    DB_HOST="hk8484gs8wgso4scw0ckcc8s" \
-    DB_PORT="5432" \
-    DB_USER="postgres" \
-    DB_PASSWORD="DGkv6CnuAcaIl6SfdQhfo4x3rxikvcZLBYQT53Ix6p1hBZufjfm3RTwmTuhKwRGx" \
-    DB_NAME="postgres" \
+    # Variables d'environnement pour la base de données
+    # Utilisation d'une URL de connexion explicite pour éviter les problèmes de résolution DNS
+    DATABASE_URL="postgresql://postgres:DGkv6CnuAcaIl6SfdQhfo4x3rxikvcZLBYQT53Ix6p1hBZufjfm3RTwmTuhKwRGx@hk8484gs8wgso4scw0ckcc8s:5432/postgres" \
     # Configuration du domaine et de l'environnement
     ENV="production" \
     HOST="phishgard.paulette.usts.ai" \

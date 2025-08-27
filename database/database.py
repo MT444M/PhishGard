@@ -11,22 +11,32 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("database")
 
+# Récupérer les valeurs des variables pour la journalisation
+log_db_host = os.getenv("DB_HOST", "localhost")
+log_db_port = os.getenv("DB_PORT", "5432")
+log_db_name = os.getenv("DB_NAME", "phishgard_db")
+log_db_user = os.getenv("DB_USER", "phishgard_user")
+log_db_password = os.getenv("DB_PASSWORD", "password")
+
 # Si DATABASE_URL est fourni directement, on l'utilise, sinon on le construit à partir des variables individuelles
 DATABASE_URL = os.getenv("DATABASE_URL")
 
 if not DATABASE_URL:
-    # Valeurs pour l'environnement actuel (production ou développement)
-    DB_USER = os.getenv("DB_USER", "phishgard_user")
-    DB_PASSWORD = os.getenv("DB_PASSWORD", "password")
-    DB_HOST = os.getenv("DB_HOST", "localhost")
-    DB_PORT = os.getenv("DB_PORT", "5432")
-    DB_NAME = os.getenv("DB_NAME", "phishgard_db")
-    
-    # Construction de l'URL de connexion
-    DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+    # Construction de l'URL de connexion à partir des variables déjà récupérées
+    DATABASE_URL = f"postgresql://{log_db_user}:{log_db_password}@{log_db_host}:{log_db_port}/{log_db_name}"
 
 # Journalisation des informations de connexion (sans le mot de passe)
-logging.info(f"Tentative de connexion à la base de données: {DB_HOST}:{DB_PORT}/{DB_NAME} avec l'utilisateur {DB_USER}")
+logging.info(f"DATABASE_URL présent: {DATABASE_URL is not None}")
+logging.info(f"Tentative de connexion à la base de données: {log_db_host}:{log_db_port}/{log_db_name} avec l'utilisateur {log_db_user}")
+
+try:
+    # Masquer le mot de passe dans l'URL pour le logging (en toute sécurité)
+    masked_url = DATABASE_URL
+    if log_db_password and log_db_password in masked_url:
+        masked_url = masked_url.replace(log_db_password, '***')
+    logging.info(f"URL finale de connexion: {masked_url}")
+except Exception as e:
+    logging.warning(f"Impossible d'afficher l'URL masquée: {e}")
 
 # Création de l'engine avec des options de débogage
 engine = create_engine(
