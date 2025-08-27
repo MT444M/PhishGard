@@ -1,7 +1,6 @@
 # PhishGard-AI/core/email_orchestrator.py
 
 import re
-import json
 
 # --- AJOUTS POUR LA BASE DE DONNÉES ---
 from sqlalchemy.orm import Session
@@ -14,13 +13,15 @@ from core import email_client
 from email_analysis import header_parser, heuristic_analyzer, osint_enricher, llm_analyzer
 from core.url_orchestrator import URLOrchestrator
 from core.final_aggregator import FinalAggregator
+from config.logging_config import get_logger
 
+logger = get_logger(__name__)
 
 def extract_urls_from_body(body_text):
     """Extrait toutes les URLs uniques d'un texte."""
     if not body_text:
         return []
-    url_pattern = re.compile(r'https?://[^\s"\'<>]+')
+    url_pattern = re.compile(r'https?://[^"\s\'<>]*')
     urls = url_pattern.findall(body_text)
     return list(set(urls))
 
@@ -45,13 +46,12 @@ class EmailOrchestrator:
         et sauvegarde en base de données.
         """
         email_id = email_data.get('id')
-        print(f"\n--- Début de l'orchestration pour l'e-mail ID: {email_id} ---")
+        logger.info(f"--- Début de l'orchestration pour l'e-mail ID: {email_id} ---")
 
         # 1. VÉRIFICATION DU CACHE EN BASE DE DONNÉES
-        print(f"[CACHE] Vérification de l'existence d'une analyse pour l'ID: {email_id}")
         cached_analysis = crud.get_analysis_by_gmail_id(self.db, gmail_id=email_id, user_id=user_id)
         if cached_analysis:
-            print(f"      ... Analyse trouvée en cache. Retour du résultat existant.")
+            logger.info("Analyse trouvée en cache. Retour du résultat existant.")
             # On reconstruit un rapport final à partir des données de la BDD
             return {
                 "id_email": email_id,
@@ -62,29 +62,29 @@ class EmailOrchestrator:
                 "breakdown": cached_analysis.breakdown
             }
         
-        print("      ... Aucune analyse en cache. Lancement du pipeline complet.")
+        logger.info("Aucune analyse en cache. Lancement du pipeline complet.")
 
         # 2. PIPELINE D'ANALYSE (si pas de cache)
-        print("[1/5] Parsing des en-têtes...")
+        logger.info("[1/5] Parsing des en-têtes...")
         parsed_headers = header_parser.parse_email_headers(email_data.get('full_headers', []))
         
-        print("[2/5] Lancement de l'enrichissement OSINT...")
+        logger.info("[2/5] Lancement de l'enrichissement OSINT...")
         osint_results = osint_enricher.enrich_with_osint_data(parsed_headers)
 
-        print("[3/5] Lancement de l'analyse heuristique...")
+        logger.info("[3/5] Lancement de l'analyse heuristique...")
         heuristic_results = heuristic_analyzer.analyze_header_heuristics(parsed_headers, osint_results)
 
-        print("[4/5] Lancement de l'analyse par le LLM...")
+        logger.info("[4/5] Lancement de l'analyse par le LLM...")
         llm_input = { "sender": email_data.get("sender"), "subject": email_data.get("subject"), "body": email_data.get("body") }
         llm_results = self.llm_analyzer_instance.analyze(llm_input)
         
-        print("[5/5] Extraction et analyse des URLs...")
+        logger.info("[5/5] Extraction et analyse des URLs...")
         extracted_urls = extract_urls_from_body(email_data.get('body'))
         
         url_model_results = {"prediction": "N/A", "details": "Aucune URL trouvée dans l'e-mail."}
         if extracted_urls:
             first_url = extracted_urls[0]
-            print(f"      ... Analyse de la première URL : {first_url}")
+            logger.info(f"Analyse de la première URL : {first_url}")
             url_orchestrator = URLOrchestrator(first_url)
             # Note: Assurez-vous que vos méthodes dans URLOrchestrator sont accessibles si préfixées par `_`
             # Idéalement, elles devraient être publiques : .collect_ml_features() et .make_prediction()
@@ -95,10 +95,10 @@ class EmailOrchestrator:
                 "details": [{"url": first_url, **prediction_data}]
             }
         else:
-            print("      ... Aucune URL trouvée.")
+            logger.info("Aucune URL trouvée.")
 
         # 3. AGRÉGATION FINALE
-        print("\n[FIN] Agrégation de tous les résultats...")
+        logger.info("[FIN] Agrégation de tous les résultats...")
         aggregator = FinalAggregator(
             heuristic_results=heuristic_results,
             url_model_results=url_model_results,
@@ -107,25 +107,25 @@ class EmailOrchestrator:
             email_id=email_id
         )
         final_report = aggregator.calculate_final_verdict()
-        print("--- Analyse complète terminée. ---")
+        logger.info("--- Analyse complète terminée. ---")
 
         # 4. SAUVEGARDE DU NOUVEAU RAPPORT EN BASE DE DONNÉES
-        print(f"[SAVE] Sauvegarde du nouveau rapport pour l'ID: {email_id} en base de données.")
+        logger.info(f"[SAVE] Sauvegarde du nouveau rapport pour l'ID: {email_id} en base de données.")
 
         # debug
-        print(f"snippet: {email_data.get('snippet')}")
+        logger.debug(f"snippet: {email_data.get('snippet')}")
         crud.create_email_and_analysis(
             db=self.db,
             email_data=email_data,
             analysis_report=final_report,
             user_id=user_id
         )
-        print("      ... Sauvegarde réussie.")
+        logger.info("Sauvegarde réussie.")
 
         # 5. NOUVEAU: APPLICATION DU LIBELLÉ SUR GMAIL
         verdict = final_report.get("phishgard_verdict")
         if verdict and verdict != "UNPROCESSED":
-            print(f"[LABEL] Début du processus d'étiquetage pour le verdict: {verdict}")
+            logger.info(f"[LABEL] Début du processus d'étiquetage pour le verdict: {verdict}")
             try:
                 # Obtenir l'ID du libellé (le crée s'il n'existe pas)
                 label_id = email_client.get_or_create_label_id(gmail_service, verdict)
@@ -133,8 +133,7 @@ class EmailOrchestrator:
                 email_client.apply_label_to_email(gmail_service, email_id, label_id)
             except Exception as e:
                 # On ne veut pas que l'API échoue si l'étiquetage rate
-                print(f"[LABEL] ERREUR: Le processus d'étiquetage a échoué : {e}")
-
+                logger.error(f"[LABEL] ERREUR: Le processus d'étiquetage a échoué : {e}")
 
 
         return final_report

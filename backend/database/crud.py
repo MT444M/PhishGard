@@ -4,7 +4,7 @@
 
 from sqlalchemy.orm import Session
 from . import models
-from datetime import datetime, timezone
+from datetime import datetime
 import re
 
 #--- User CRUD ---

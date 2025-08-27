@@ -12,10 +12,9 @@ It comprises two sets of functions:
 """
 
 import requests
-from urllib.parse import urlparse, urljoin
+from urllib.parse import urlparse
 from bs4 import BeautifulSoup
 from html import unescape
-import re
 
 
 # -------------------------------

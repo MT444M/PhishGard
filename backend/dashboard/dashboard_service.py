@@ -32,6 +32,7 @@ def _calculate_trend(current_value: float, previous_value: float) -> tuple[float
 
 def get_dashboard_summary(
     db: Session,
+    user_id: int,
     period: str = '7d',
     custom_start_date: str = None,
     custom_end_date: str = None
@@ -69,13 +70,19 @@ def get_dashboard_summary(
         func.count(models.EmailAnalysis.id).label("total"),
         func.sum(case((models.EmailAnalysis.phishgard_verdict == 'Phishing', 1), else_=0)).label("phishing"),
         func.sum(case((models.EmailAnalysis.phishgard_verdict == 'Suspicious', 1), else_=0)).label("suspicious")
-    ).filter(models.EmailAnalysis.analyzed_at.between(start_date, end_date)).one()
+    ).join(models.Email).filter(
+        models.Email.user_id == user_id,
+        models.EmailAnalysis.analyzed_at.between(start_date, end_date)
+    ).one()
     
     previous_kpis_query = db.query(
         func.count(models.EmailAnalysis.id).label("total"),
         func.sum(case((models.EmailAnalysis.phishgard_verdict == 'Phishing', 1), else_=0)).label("phishing"),
         func.sum(case((models.EmailAnalysis.phishgard_verdict == 'Suspicious', 1), else_=0)).label("suspicious")
-    ).filter(models.EmailAnalysis.analyzed_at.between(previous_start_date, previous_end_date)).one()
+    ).join(models.Email).filter(
+        models.Email.user_id == user_id,
+        models.EmailAnalysis.analyzed_at.between(previous_start_date, previous_end_date)
+    ).one()
         
     total_trend, total_dir = _calculate_trend(current_kpis_query.total or 0, previous_kpis_query.total or 0)
     phishing_trend, phishing_dir = _calculate_trend(current_kpis_query.phishing or 0, previous_kpis_query.phishing or 0)
@@ -101,7 +108,10 @@ def get_dashboard_summary(
         func.sum(case((models.EmailAnalysis.phishgard_verdict == 'Phishing', 1), else_=0)).label("phishing"),
         func.sum(case((models.EmailAnalysis.phishgard_verdict == 'Suspicious', 1), else_=0)).label("suspicious"),
         func.sum(case((models.EmailAnalysis.phishgard_verdict.notin_(['Phishing', 'Suspicious']), 1), else_=0)).label("legitimate")
-    ).filter(models.EmailAnalysis.analyzed_at.between(start_date, end_date)).group_by("date").order_by("date").all()
+    ).join(models.Email).filter(
+        models.Email.user_id == user_id,
+        models.EmailAnalysis.analyzed_at.between(start_date, end_date)
+    ).group_by("date").order_by("date").all()
     
     data_map = {str(row.date): row for row in daily_volume_query}
 
@@ -135,6 +145,7 @@ def get_dashboard_summary(
         daily_volume=daily_volume, status_distribution=status_distribution, phishing_categories=phishing_categories
     )
     latest_threats_query = db.query(models.EmailAnalysis).join(models.Email).filter(
+        models.Email.user_id == user_id,
         models.EmailAnalysis.phishgard_verdict.in_(['Phishing', 'Suspicious'])
     ).order_by(models.EmailAnalysis.analyzed_at.desc()).limit(5).all()
     latest_threats = [
@@ -160,6 +171,3 @@ def get_dashboard_summary(
     # print("DASHBOARD RESPONSE JSON:", json.dumps(jsonable_encoder(response), indent=2, default=str))
 
     return response
-
-
-           

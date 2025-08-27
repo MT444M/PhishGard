@@ -30,6 +30,7 @@ Liste des tâches à faire :
 
 // python -m http.server 8080
 // sudo -u postgres psql
+// uvicorn main_api:app --reload
 
 # remove WebsitePhishingDetection from Github
 

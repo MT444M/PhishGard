@@ -1,7 +1,7 @@
 # backend/auth/auth_router.py
 
 from fastapi import APIRouter, Depends, HTTPException, status, Response
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, JSONResponse
 from sqlalchemy.orm import Session
 import requests
 
@@ -99,9 +99,10 @@ def auth_callback(code: str, response: Response, db: Session = Depends(get_db)):
         )
 
 @router.post("/logout")
-def logout(response: Response):
+def logout():
     """
     Déconnecte l'utilisateur en supprimant le cookie de session.
     """
-    response.delete_cookie("access_token")
-    return {"message": "Déconnexion réussie"}
+    response = JSONResponse(content={"message": "Déconnexion réussie"})
+    response.delete_cookie("access_token", domain="localhost")
+    return response

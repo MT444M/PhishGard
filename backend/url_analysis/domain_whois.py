@@ -6,7 +6,6 @@ import whois
 import requests
 import socket
 from datetime import datetime, timezone
-import requests
 
 def parse_domain(url: str) -> dict:
     """

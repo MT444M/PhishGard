@@ -1,6 +1,5 @@
 # PhishGard-AI/analysis/llm_analyzer.py
 
-import json
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from config import settings # On garde l'import pour les configs par défaut
 # import settings

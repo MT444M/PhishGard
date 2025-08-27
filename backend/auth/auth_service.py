@@ -23,12 +23,14 @@ fernet = Fernet(settings.FERNET_KEY.encode())
 
 def encrypt_token(token: str) -> str:
     """Chiffre un token en utilisant la clé Fernet."""
-    if not token: return None
+    if not token:
+        return None
     return fernet.encrypt(token.encode()).decode()
 
 def decrypt_token(encrypted_token: str) -> str:
     """Déchiffre un token en utilisant la clé Fernet."""
-    if not encrypted_token: return None
+    if not encrypted_token:
+        return None
     return fernet.decrypt(encrypted_token.encode()).decode()
 
 

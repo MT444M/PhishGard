@@ -60,7 +60,8 @@ def analyze_header_heuristics(parsed_headers, osint_results):
                 if from_domain and dkim.get("domain") and dkim.get("domain").endswith(from_domain):
                     score += 15
                     flags["positive"].append(f"DKIM_PASS_ALIGNED(domain:{dkim.get('domain')}) (+15)")
-                    if auth_strength != "strong": auth_strength = "moderate"
+                    if auth_strength != "strong":
+                        auth_strength = "moderate"
                 else:
                     score -= 5
                     flags["negative"].append(f"DKIM_PASS_UNALIGNED(domain:{dkim.get('domain')}) (-5)")

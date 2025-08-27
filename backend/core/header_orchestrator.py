@@ -1,7 +1,6 @@
 # PhishGard-AI/core/header_orchestrator.py
 
 import json
-import re
 from email_analysis import header_parser, heuristic_analyzer, osint_enricher
 from core.final_aggregator import FinalAggregator
 

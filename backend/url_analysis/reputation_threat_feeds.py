@@ -3,7 +3,6 @@
 
 import requests
 import hashlib
-import time
 
 # -------------- Google Safe Browsing ----------------
 def get_google_safebrowsing(api_key: str, url: str) -> dict:
@@ -97,7 +96,7 @@ def get_wot_reputation(api_key: str, domain: str) -> dict:
     Retrieves community reputation scores from Web of Trust API.
     Returns domain ratings for trustworthiness, child safety.
     """
-    endpoint = f"http://api.mywot.com/0.4/public_link_json2"
+    endpoint = "http://api.mywot.com/0.4/public_link_json2"
     params = {"hosts": domain + "/", "key": api_key}
     try:
         resp = requests.get(endpoint, params=params, timeout=5)

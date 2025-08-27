@@ -1,108 +1,134 @@
 # backend/main_api.py
 
 import uvicorn
+from typing import Optional
 from fastapi import FastAPI, HTTPException, Depends
-from sqlalchemy.orm import Session 
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
-
-from dashboard import dashboard_service
-from dashboard.schemas import DashboardResponse 
-
+from sqlalchemy.orm import Session
 from pydantic import BaseModel, Field
-import json
-from typing import Optional 
-import os
+from googleapiclient.discovery import Resource
 
-# --- Import de vos modules d'analyse ---
-# Nous ajustons les imports pour qu'ils fonctionnent depuis le dossier backend/
+# =============================================================================
+# CONFIGURATION DU LOGGING
+# =============================================================================
+from config.logging_config import setup_logging, get_logger
+
+# Initialiser le logging au démarrage
+setup_logging()
+logger = get_logger(__name__)
+
+# =============================================================================
+# IMPORTS DES MODULES PERSONNALISÉS
+# =============================================================================
+from dashboard import dashboard_service
+from dashboard.schemas import DashboardResponse
+
 from core.email_orchestrator import EmailOrchestrator
 from core.url_orchestrator import URLOrchestrator
 from core.header_orchestrator import HeaderOrchestrator
-from core import email_client # On garde l'authentification
+from core import email_client
 
-from database import crud, models
-from database.database import SessionLocal, engine, get_db
+from database import models
+from database.database import engine, get_db
 
-from auth import auth_router, auth_service # <== AJOUTER auth_service
-from googleapiclient.discovery import Resource # <== AJOUTER pour le type hinting
+from auth import auth_router, auth_service
 
-
-# ==============================================================================
-# 0. CRÉATION DES TABLES DE LA BASE DE DONNÉES
-# ==============================================================================
-# Cette ligne crée les tables définies dans `models.py` si elles n'existent pas.
+# =============================================================================
+# CRÉATION DES TABLES DE LA BASE DE DONNÉES
+# =============================================================================
+# Cette ligne crée les tables définies dans `models.py` si elles n'existent pas
 models.Base.metadata.create_all(bind=engine)
+logger.info("Tables de base de données créées/vérifiées")
 
-# ==============================================================================
-# 1. INITIALISATION DE L'APPLICATION FastAPI
-# ==============================================================================
+# =============================================================================
+# INITIALISATION DE L'APPLICATION FastAPI
+# =============================================================================
 app = FastAPI(
     title="PhishGard-AI API",
     description="API pour l'analyse d'emails et d'URLs afin de détecter le phishing.",
     version="1.0.0"
 )
 
-# --- Configuration CORS (Cross-Origin Resource Sharing) ---
-# C'est INDISPENSABLE pour que votre frontend (qui tournera sur un port différent)
-# puisse communiquer avec votre backend.
+logger.info("Application FastAPI initialisée")
+
+# Configuration CORS (Cross-Origin Resource Sharing)
+# INDISPENSABLE pour que le frontend puisse communiquer avec le backend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://127.0.0.1:8080", "http://localhost:8080"],  # En production, vous devriez restreindre à l'URL de votre frontend
+    allow_origins=[
+        "http://127.0.0.1:8080", 
+        "http://localhost:8080",
+        "http://127.0.0.1:8000",
+        "http://localhost:8000"
+    ],  # En production, restreindre à l'URL de votre frontend
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-app.include_router(auth_router.router)
+logger.info("Middleware CORS configuré")
 
-# ==============================================================================
-# 2. MODÈLES DE DONNÉES (Pydantic)
-# ==============================================================================
-# Pydantic assure que les données envoyées à votre API ont le bon format.
+# Inclusion du routeur d'authentification
+app.include_router(auth_router.router)
+logger.info("Routeur d'authentification inclus")
+
+# =============================================================================
+# MODÈLES DE DONNÉES (Pydantic)
+# =============================================================================
+# Pydantic assure que les données envoyées à l'API ont le bon format
 
 class URLAnalyzeRequest(BaseModel):
+    """Modèle pour les requêtes d'analyse d'URL"""
     url: str = Field(..., example="http://example-phishing-site.com")
 
 class EmailAnalyzeRequest(BaseModel):
+    """Modèle pour les requêtes d'analyse d'email"""
     # Pour l'instant on se base sur l'ID, on pourra ajouter le contenu brut plus tard
     email_id: str = Field(..., example="197640cc612987c5")
 
 class HeaderAnalyzeRequest(BaseModel):
-    raw_header: str = Field(..., example="Received: from mail-sor-f69.google.com (mail-sor-f69.google.com. [209.85.220.69])\n by mx.google.com ...")
+    """Modèle pour les requêtes d'analyse d'en-tête brut"""
+    raw_header: str = Field(
+        ..., 
+        example="Received: from mail-sor-f69.google.com (mail-sor-f69.google.com. [209.85.220.69]) by mx.google.com ..."
+    )
 
-
-# C'est une bonne pratique pour ne pas renvoyer de données sensibles comme les tokens
 class UserResponse(BaseModel):
+    """Modèle de réponse pour les informations utilisateur"""
+    # Bonne pratique pour ne pas renvoyer de données sensibles comme les tokens
     email: str
     google_id: str
 
     class Config:
-        orm_mode = True # Permet à Pydantic de lire les données depuis un objet SQLAlchemy
+        orm_mode = True  # Permet à Pydantic de lire les données depuis un objet SQLAlchemy
 
-
-# ==============================================================================
-# 3. DÉFINITION DES ENDPOINTS DE L'API
-# ==============================================================================
-# Endpoint racine pour vérifier que l'API est en ligne
-@app.get("/")
-def root():
-    return {"message": "Bienvenue sur l'API PhishGard-AI. Utilisez /api pour accéder aux fonctionnalités."}
+# =============================================================================
+# ENDPOINTS GÉNÉRAUX
+# =============================================================================
 
 @app.get("/api")
 def read_root():
+    """Endpoint racine pour vérifier que l'API est en ligne"""
+    logger.info("Endpoint racine appelé")
     return {"status": "PhishGard-AI API est en ligne"}
 
+# =============================================================================
+# ENDPOINTS GESTION UTILISATEUR
+# =============================================================================
 
-# --- AJOUTE CE NOUVEL ENDPOINT ---
 @app.get("/api/users/me", response_model=UserResponse)
 def get_logged_in_user(current_user: models.User = Depends(auth_service.get_current_user)):
     """
     Endpoint protégé qui renvoie les informations de l'utilisateur actuellement connecté.
     La dépendance `get_current_user` gère toute la validation du cookie JWT.
     """
+    logger.info(f"Récupération des informations utilisateur pour ID: {current_user.id}")
     return current_user
 
-
+# =============================================================================
+# ENDPOINTS GESTION DES EMAILS
+# =============================================================================
 
 @app.get("/api/emails")
 def get_email_list(
@@ -112,85 +138,142 @@ def get_email_list(
     """
     Endpoint SÉCURISÉ pour récupérer la liste des emails pour l'utilisateur connecté.
     """
+    logger.info(f"Récupération de la liste des emails pour l'utilisateur {current_user.email}")
+    
     if not gmail_service:
+        logger.error("Service Gmail non disponible")
         raise HTTPException(status_code=503, detail="Service Gmail non disponible.")
     
     try:
-        # Récupère les 25 derniers emails de la boîte de reception
-        live_emails = email_client.get_emails(gmail_service, max_results= 10)
+        # Récupère les 10 derniers emails de la boîte de réception
+        live_emails = email_client.get_emails(gmail_service, max_results=10)
+        logger.info(f"Récupération de {len(live_emails)} emails depuis Gmail")
         
-        # Formatte les données pour le frontend.
-        # Notez qu'il n'y a PAS de verdict ou de score ici au début.
+        # Formatte les données pour le frontend
+        # Notez qu'il n'y a PAS de verdict ou de score ici au début
         formatted_emails = []
         for email in live_emails:
             formatted_emails.append({
                 "id": email.get('id'),
                 "sender": email.get('sender'),
                 "subject": email.get('subject'),
-                "preview": email.get('snippet', ''), # Le snippet de l'API Gmail est parfait pour l'aperçu
+                "preview": email.get('snippet', ''),  # Le snippet de l'API Gmail est parfait pour l'aperçu
                 "body": email.get('body', ''),  # Le corps de l'email
                 "html_body": email.get('html_body', ''),  # Le corps HTML de l'email
                 "timestamp": email.get('timestamp', ''),  # Le timestamp de l'email
             })
-            #debug
+        
+        logger.info(f"Emails formatés avec succès: {len(formatted_emails)} emails")
         return formatted_emails
         
     except Exception as e:
-        print(f"Erreur lors de la récupération des emails live: {e}")
-        raise HTTPException(status_code=500, detail=f"Une erreur est survenue lors de la récupération des emails: {e}")
-    
+        logger.error(f"Erreur lors de la récupération des emails live: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Une erreur est survenue lors de la récupération des emails: {e}"
+        )
 
-
-@app.post("/api/analyze/email") 
+@app.post("/api/analyze/email")
 def analyze_email(
     request: EmailAnalyzeRequest,
     db: Session = Depends(get_db),
     current_user: models.User = Depends(auth_service.get_current_user),
     gmail_service: Resource = Depends(auth_service.get_gmail_service)
-    ):
+):
     """
     Analyse un email complet en utilisant son ID.
     Vérifie le cache en BDD et sauvegarde le nouveau résultat.
-    et applique les libellés appropriés sur Gmail.
+    Applique les libellés appropriés sur Gmail.
     """
+    logger.info(f"Demande d'analyse d'email ID: {request.email_id} pour l'utilisateur {current_user.email}")
+    
     if not gmail_service:
+        logger.error("Service Gmail non disponible pour l'analyse d'email")
         raise HTTPException(status_code=503, detail="Service Gmail non disponible.")
     
     try:
         email_data_list = email_client.get_emails(gmail_service, email_id=request.email_id)
         if not email_data_list:
-            raise HTTPException(status_code=404, detail=f"Email avec l'ID {request.email_id} non trouvé.")
+            logger.warning(f"Email avec l'ID {request.email_id} non trouvé")
+            raise HTTPException(
+                status_code=404, 
+                detail=f"Email avec l'ID {request.email_id} non trouvé."
+            )
         
         email_data = email_data_list[0]
+        logger.info(f"Email récupéré avec succès: {email_data.get('subject', 'Sans sujet')}")
         
         # On l'instancie ici, en lui passant la session de BDD de la requête
         email_orchestrator = EmailOrchestrator(db=db)
 
-         # On passe maintenant l'ID de l'utilisateur à l'orchestrateur
-        final_report = email_orchestrator.run_full_analysis(email_data, gmail_service=gmail_service, user_id=current_user.id)
+        # On passe maintenant l'ID de l'utilisateur à l'orchestrateur
+        final_report = email_orchestrator.run_full_analysis(
+            email_data, 
+            gmail_service=gmail_service, 
+            user_id=current_user.id
+        )
 
+        logger.info(f"Analyse d'email terminée avec succès pour ID: {request.email_id}")
         return final_report
+        
     except Exception as e:
-        print(f"Erreur lors de l'analyse de l'email: {e}")
-        raise HTTPException(status_code=500, detail=f"Une erreur interne est survenue: {e}")
+        logger.error(f"Erreur lors de l'analyse de l'email {request.email_id}: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Une erreur interne est survenue: {e}"
+        )
 
+# =============================================================================
+# ENDPOINTS ANALYSE D'EN-TÊTES
+# =============================================================================
+
+@app.post("/api/analyze/header")
+def analyze_raw_header(request: HeaderAnalyzeRequest):
+    """
+    Analyse un en-tête d'e-mail brut fourni dans le corps de la requête.
+    """
+    logger.info("Demande d'analyse d'en-tête brut reçue")
     
+    try:
+        # On instancie notre nouvel orchestrateur
+        header_orchestrator = HeaderOrchestrator()
+        final_report = header_orchestrator.run_header_analysis(request.raw_header)
+        
+        logger.info("Analyse d'en-tête brut terminée avec succès")
+        return final_report
+        
+    except Exception as e:
+        logger.error(f"Erreur lors de l'analyse du header brut: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Une erreur interne est survenue: {str(e)}"
+        )
 
-# --- NOUVEAUX Endpoints pour les URLs ---
+# =============================================================================
+# ENDPOINTS ANALYSE D'URLs
+# =============================================================================
 
 @app.post("/api/url/context")
 def get_url_contextual_analysis(request: URLAnalyzeRequest):
     """
     Endpoint pour l'analyse 'humaine'.
-    Récupère des informations contextuelles détaillées sur une URL (WHOIS, DNS, SSL...). 
+    Récupère des informations contextuelles détaillées sur une URL (WHOIS, DNS, SSL...).
     """
+    logger.info(f"Demande d'analyse contextuelle pour l'URL: {request.url}")
+    
     try:
         orchestrator = URLOrchestrator(request.url)
         analysis_result = orchestrator.run_contextual_analysis()
+        
+        logger.info(f"Analyse contextuelle terminée avec succès pour: {request.url}")
         return analysis_result
+        
     except Exception as e:
-        print(f"Erreur lors de l'analyse contextuelle de l'URL: {e}")
-        raise HTTPException(status_code=500, detail=f"Une erreur interne est survenue: {str(e)}")
+        logger.error(f"Erreur lors de l'analyse contextuelle de l'URL {request.url}: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Une erreur interne est survenue: {str(e)}"
+        )
 
 @app.post("/api/url/predict")
 def get_url_prediction(request: URLAnalyzeRequest):
@@ -198,71 +281,70 @@ def get_url_prediction(request: URLAnalyzeRequest):
     Endpoint pour la prédiction 'machine'.
     Analyse une URL et renvoie le verdict du modèle de Machine Learning.
     """
+    logger.info(f"Demande de prédiction pour l'URL: {request.url}")
+    
     try:
         orchestrator = URLOrchestrator(request.url)
         prediction_result = orchestrator.run_prediction()
+        
+        logger.info(f"Prédiction terminée avec succès pour: {request.url}")
         return prediction_result
+        
     except Exception as e:
-        print(f"Erreur lors de la prédiction pour l'URL: {e}")
-        raise HTTPException(status_code=500, detail=f"Une erreur interne est survenue: {str(e)}")
-    
+        logger.error(f"Erreur lors de la prédiction pour l'URL {request.url}: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Une erreur interne est survenue: {str(e)}"
+        )
 
-# -----------------------------------------------------------------------------
-# ------ Nouveaux Endpoints pour le Dashboard -------
-# -----------------------------------------------------------------------------
-# On utilise `response_model` pour garantir que la sortie de l'API correspondra au schéma
+# =============================================================================
+# ENDPOINTS TABLEAU DE BORD
+# =============================================================================
+
 @app.get("/api/dashboard/summary", response_model=DashboardResponse)
 def get_dashboard_data(
     db: Session = Depends(get_db),
-    period: str = "7d", # On garde une valeur par défaut
-    start_date: Optional[str] = None, # Date de début personnalisée
-    end_date: Optional[str] = None # Date de fin personnalisée
+    current_user: models.User = Depends(auth_service.get_current_user),
+    period: str = "7d",  # On garde une valeur par défaut
+    start_date: Optional[str] = None,  # Date de début personnalisée
+    end_date: Optional[str] = None  # Date de fin personnalisée
 ):
     """
     Endpoint principal pour le dashboard.
     Accepte une période prédéfinie ('today', '7d', '30d') ou une plage de dates personnalisée.
     """
+    logger.info(f"Génération du dashboard pour l'utilisateur {current_user.email} - Période: {period}")
+    
     try:
         # On passe tous les paramètres au service, qui contiendra la logique
         summary_data = dashboard_service.get_dashboard_summary(
             db=db,
+            user_id=current_user.id,
             period=period,
             custom_start_date=start_date,
             custom_end_date=end_date
         )
+        
+        logger.info(f"Dashboard généré avec succès pour l'utilisateur {current_user.email}")
         return summary_data
+        
     except Exception as e:
-        print(f"Erreur lors de la génération du résumé du dashboard: {e}")
+        logger.error(f"Erreur lors de la génération du résumé du dashboard pour l'utilisateur {current_user.email}: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail="Erreur interne du serveur.")
-    
 
-# -----------------------------------------------------------------------------
-# ------ Nouveaux Endpoints pour l'Analyse des En-têtes -------
-# -----------------------------------------------------------------------------
-@app.post("/api/analyze/header")
-def analyze_raw_header(request: HeaderAnalyzeRequest):
-    """
-    Analyse un en-tête d'e-mail brut fourni dans le corps de la requête.
-    """
-    try:
-        # On instancie notre nouvel orchestrateur
-        header_orchestrator = HeaderOrchestrator()
-        final_report = header_orchestrator.run_header_analysis(request.raw_header)
-        return final_report
-    except Exception as e:
-        print(f"Erreur lors de l'analyse du header brut: {e}")
-        # Pour le débogage, il peut être utile d'imprimer l'exception
-        import traceback
-        traceback.print_exc()
-        raise HTTPException(status_code=500, detail=f"Une erreur interne est survenue: {str(e)}")
+# =============================================================================
+# MONTAGE DU DOSSIER STATIC
+# =============================================================================
+# Cette ligne est la plus importante: elle "monte" le dossier `static`
+# pour qu'il soit servi par FastAPI.
+# html=True indique de servir index.html pour les requêtes à la racine.
+app.mount("/", StaticFiles(directory="static", html=True), name="static")
+logger.info("Dossier static monté avec succès")
 
-
-
-# ==============================================================================
-# 4. DÉMARRAGE DU SERVEUR
-# ==============================================================================
+# =============================================================================
+# DÉMARRAGE DU SERVEUR
+# =============================================================================
 if __name__ == "__main__":
-    print("Démarrage du serveur PhishGard-AI sur http://127.0.0.1:8000")
-    # uvicorn.run(app, host="0.0.0.0", port=8000)
-    # Pour un rechargement automatique lors des modifications de code, utilisez :
+    logger.info("Démarrage du serveur PhishGard-AI sur http://127.0.0.1:8000")
+    # Pour un rechargement automatique lors des modifications de code
     uvicorn.run("main_api:app", host="0.0.0.0", port=8000, reload=True)

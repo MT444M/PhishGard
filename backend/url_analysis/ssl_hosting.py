@@ -4,27 +4,23 @@ import socket
 import ssl
 import requests
 from datetime import datetime, timezone
+from dateutil.parser import parse as dateutil_parse
 from config import settings
 API_TOKEN = settings.IPINFO_API_KEY
 
 def _parse_ssl_date(date_str: str) -> datetime:
     """
-    Parses SSL date strings, handling potential whitespace issues and missing timezones.
+    Parses SSL date strings using the robust dateutil library.
     Example format: 'Jun  1 00:00:00 2025 GMT'
     """
-    # Normalize whitespace to handle cases like 'Jun  1' vs 'Jun 10'
-    normalized_date_str = " ".join(date_str.split())
+    if not date_str:
+        raise ValueError("Date string is empty")
     try:
-        # First, try parsing with timezone
-        return datetime.strptime(normalized_date_str, '%b %d %H:%M:%S %Y %Z')
-    except ValueError:
-        # If that fails, try parsing without timezone
-        # This handles cases where TZ is missing or not recognized
-        try:
-            return datetime.strptime(normalized_date_str, '%b %d %H:%M:%S %Y')
-        except ValueError as e:
-            # If both fail, raise an error to avoid continuing with a bad date
-            raise ValueError(f"Could not parse date: {date_str}") from e
+        # The dateutil parser is very flexible and can handle various formats
+        return dateutil_parse(date_str)
+    except (ValueError, TypeError) as e:
+        # If parsing fails, raise a specific error to avoid continuing with a bad date
+        raise ValueError(f"Could not parse date: {date_str}") from e
 
 def format_domain_age(age_days: int) -> str:
     """
@@ -97,7 +93,6 @@ def get_extended_ssl_info(domain: str, port: int = 443, timeout: int = 5) -> dic
         with socket.create_connection((domain, port), timeout=timeout) as sock:
             with ctx.wrap_socket(sock, server_hostname=domain) as ssock:
                 cert = ssock.getpeercert()
-                cert_der = ssock.getpeercert(binary_form=True)
                 
                 # Informations détaillées sur la connexion SSL
                 protocol_version = ssock.version()
@@ -175,7 +170,7 @@ def get_supported_protocols(domain: str, port: int = 443, timeout: int = 3) -> l
                     version = ssock.version()
                     if version and version not in supported:
                         supported.append(version)
-        except:
+        except Exception:
             continue
     
     return supported

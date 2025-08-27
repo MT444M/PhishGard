@@ -169,8 +169,8 @@ export async function analyzeUrlPredict(url) {
  * @returns {Promise<Object>} - Les données du tableau de bord avec statistiques
  * @throws {Error} - En cas d'erreur réseau ou serveur
  */
-export async function getDashboardData(period = 7) {
-    const url = `${API_BASE_URL}/api/dashboard/summary?period=${period}`;
+export async function getDashboardData(period = '7d') {
+    const url = `${API_BASE_URL}/dashboard/summary?period=${period}`;
     console.log(`Fetching dashboard data from: ${url}`);
     
     try {

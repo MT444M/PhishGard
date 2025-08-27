@@ -1,6 +1,13 @@
+# PhishGard-AI/analysis/osint_enricher.py
+
+import requests
+import whois
+from datetime import datetime
+from dateutil import parser as dateutil_parser
+from config import settings
+
 def parse_ssl_date(date_str):
     """Parse une date SSL au format 'Aug 10 13:39:42 2025 GMT' ou retourne la chaîne brute si échec."""
-    from datetime import datetime
     try:
         return datetime.strptime(date_str, '%b %d %H:%M:%S %Y %Z')
     except ValueError:
@@ -9,16 +16,6 @@ def parse_ssl_date(date_str):
             return datetime.strptime(date_str.replace(' GMT', ''), '%b %d %H:%M:%S %Y')
         except ValueError:
             return date_str
-# PhishGard-AI/analysis/osint_enricher.py
-
-import requests
-import whois
-from datetime import datetime
-from dateutil import parser as dateutil_parser
-
-# Suivant votre nouvelle architecture, les clés API sont dans un fichier de config
-# qui est chargé dans l'objet settings.
-from config import settings
 
 # --- Fonctions de base (correctement refactorisées) ---
 

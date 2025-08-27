@@ -26,10 +26,14 @@ numpy
 scikit-learn
 joblib
 tldextract
-python-whois
 beautifulsoup4
 selenium
 
 # Web Framework
 uvicorn 
 fastapi
+gunicorn
+
+# database
+# "sqlalchemy[asyncio]" aiosqlite
+psycopg2-binary # pour postgresql
