@@ -11,15 +11,19 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("database")
 
-# Valeurs par défaut pour le développement local
-DB_USER = os.getenv("DB_USER", "phishgard_user")
-DB_PASSWORD = os.getenv("DB_PASSWORD", "password")
-DB_HOST = os.getenv("DB_HOST", "localhost")
-DB_PORT = os.getenv("DB_PORT", "5432")
-DB_NAME = os.getenv("DB_NAME", "phishgard_db")
+# Si DATABASE_URL est fourni directement, on l'utilise, sinon on le construit à partir des variables individuelles
+DATABASE_URL = os.getenv("DATABASE_URL")
 
-# Construction de l'URL de connexion
-DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+if not DATABASE_URL:
+    # Valeurs pour l'environnement actuel (production ou développement)
+    DB_USER = os.getenv("DB_USER", "phishgard_user")
+    DB_PASSWORD = os.getenv("DB_PASSWORD", "password")
+    DB_HOST = os.getenv("DB_HOST", "localhost")
+    DB_PORT = os.getenv("DB_PORT", "5432")
+    DB_NAME = os.getenv("DB_NAME", "phishgard_db")
+    
+    # Construction de l'URL de connexion
+    DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
 # Journalisation des informations de connexion (sans le mot de passe)
 logging.info(f"Tentative de connexion à la base de données: {DB_HOST}:{DB_PORT}/{DB_NAME} avec l'utilisateur {DB_USER}")
@@ -56,9 +60,12 @@ def get_db():
         yield db
     except Exception as e:
         logger.error(f"Erreur lors de l'accès à la base de données: {e}")
-        # Ne pas lever d'exception pour éviter de bloquer l'application
-        # Retourner None pour indiquer que la connexion a échoué
-        yield None
+        # Au lieu de retourner None, on lève une exception HTTP
+        from fastapi import HTTPException, status
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="La connexion à la base de données n'est pas disponible. Veuillez vérifier les paramètres de connexion."
+        )
     finally:
         logger.debug("Fermeture de la session de base de données")
         db.close()

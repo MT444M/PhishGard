@@ -19,7 +19,15 @@ SECRETS_DIR = os.path.join(CONFIG_DIR, '.secrets')
 # --- Configuration OAuth 2.0 Google ---
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
-GOOGLE_REDIRECT_URI = os.getenv("GOOGLE_REDIRECT_URI", "http://localhost:8000/api/auth/callback")
+
+# Récupérer l'hôte et le protocole pour construction des URLs
+HOST = os.getenv("HOST", "localhost:8000")
+# En production, on utilise HTTPS
+ENV = os.getenv("ENV", "development")
+PROTOCOL = "https" if ENV.lower() == "production" else "http"
+
+# Construction des URLs avec variables d'environnement
+GOOGLE_REDIRECT_URI = os.getenv("GOOGLE_REDIRECT_URI", f"{PROTOCOL}://{HOST}/api/auth/callback")
 GOOGLE_TOKEN_URI = "https://oauth2.googleapis.com/token"
 
 
@@ -27,7 +35,7 @@ GOOGLE_TOKEN_URI = "https://oauth2.googleapis.com/token"
 # --- Configuration de l'application Frontend ---
 # L'URL vers laquelle l'utilisateur est redirigé après une authentification réussie.
 # Puisque le frontend est maintenant servi par le backend, on redirige vers la racine.
-FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:8000/")
+FRONTEND_URL = os.getenv("FRONTEND_URL", f"{PROTOCOL}://{HOST}/")
 
 
 

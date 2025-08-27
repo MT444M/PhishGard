@@ -46,8 +46,14 @@ ENV PORT=8000 \
     DB_USER="postgres" \
     DB_PASSWORD="DGkv6CnuAcaIl6SfdQhfo4x3rxikvcZLBYQT53Ix6p1hBZufjfm3RTwmTuhKwRGx" \
     DB_NAME="postgres" \
-    # Autres variables d'environnement nécessaires
-    ENV="production"
+    # Configuration du domaine et de l'environnement
+    ENV="production" \
+    HOST="phishgard.paulette.usts.ai" \
+    # Si aucune URL fournie, elles seront construites à partir de HOST
+    # FRONTEND_URL="https://phishgard.paulette.usts.ai/" \
+    # GOOGLE_REDIRECT_URI="https://phishgard.paulette.usts.ai/api/auth/callback" \
+    # S'assurer que secure est true en production pour les cookies
+    SECURE_COOKIES="true"
 
 # Commande pour démarrer l'application en production
 # Utilise un fichier de configuration explicite pour gunicorn

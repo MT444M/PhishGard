@@ -79,16 +79,23 @@ def auth_callback(code: str, response: Response, db: Session = Depends(get_db)):
         
         # Stocker le JWT dans un cookie HttpOnly sécurisé
         response = RedirectResponse(url=settings.FRONTEND_URL) # Redirige vers le frontend
-        response.set_cookie(
-            key="access_token",
-            value=jwt_token,
-            httponly=True,
-            secure= False, # Mettre à True en production (nécessite HTTPS)
-            domain= "localhost",
-            # On omet samesite pour laisser le navigateur utiliser sa politique
-            # par défaut pour localhost, qui est souvent plus permissive.
-            # samesite='lax'
-        )
+        # Déterminer si nous sommes en production ou non
+        is_prod = settings.ENV.lower() == "production"
+        
+        # Configuration du cookie
+        cookie_options = {
+            "key": "access_token",
+            "value": jwt_token,
+            "httponly": True,
+            "secure": is_prod,  # Secure uniquement en production (HTTPS)
+            "samesite": "lax" if is_prod else None  # Plus sécurisé en production
+        }
+        
+        # Ne spécifie le domaine que si nécessaire, pour plus de compatibilité
+        # Le domaine est automatiquement géré par le navigateur si non spécifié
+        # Cette approche fonctionne pour localhost et les domaines de production
+        
+        response.set_cookie(**cookie_options)
         return response
 
     except Exception as e:
@@ -104,5 +111,8 @@ def logout():
     Déconnecte l'utilisateur en supprimant le cookie de session.
     """
     response = JSONResponse(content={"message": "Déconnexion réussie"})
-    response.delete_cookie("access_token", domain="localhost")
+    
+    # Supprimer le cookie sans spécifier de domaine pour plus de compatibilité
+    # Cela fonctionne à la fois pour localhost et les domaines de production
+    response.delete_cookie("access_token")
     return response
