@@ -4,7 +4,7 @@ import { handleRouteChange } from './router.js';
 import { closeModal, setupModalTabs } from './components/modal.js';
 // --- NOUVEAUX IMPORTS POUR L'AUTHENTIFICATION ---
 import { getCurrentUser } from './api.js';
-import { handleLogout } from './auth.js'; 
+import { handleLogout, initiateGoogleLogin } from './auth.js'; 
 
 // ===================================================
 // 1. SÉLECTION DES ÉLÉMENTS DU DOM
@@ -71,6 +71,12 @@ function setupEventListeners() {
         if (logoutButton) {
             logoutButton.addEventListener('click', handleLogout);
         }
+    }
+    
+    // --- Bouton de connexion Google ---
+    const googleLoginBtn = document.getElementById('google-login-btn');
+    if (googleLoginBtn) {
+        googleLoginBtn.addEventListener('click', initiateGoogleLogin);
     }
 
     // --- Écouteur global pour fermer les menus/modales ---
