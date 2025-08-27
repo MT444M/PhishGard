@@ -50,5 +50,5 @@ ENV PORT=8000 \
     ENV="production"
 
 # Commande pour démarrer l'application en production
-# Utilise le port configuré via variable d'environnement
-CMD ["gunicorn", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "-b", "0.0.0.0:${PORT}", "main_api:app"]
+# Utilise un port fixe 8000 pour éviter les problèmes de substitution de variables
+CMD ["gunicorn", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "-b", "0.0.0.0:8000", "main_api:app"]
