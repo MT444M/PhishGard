@@ -38,8 +38,24 @@ from auth import auth_router, auth_service
 # CRÉATION DES TABLES DE LA BASE DE DONNÉES
 # =============================================================================
 # Cette ligne crée les tables définies dans `models.py` si elles n'existent pas
-models.Base.metadata.create_all(bind=engine)
-logger.info("Tables de base de données créées/vérifiées")
+try:
+    # Essayer de se connecter à la base de données et de créer les tables
+    logger.info(f"Tentative de connexion à la base de données PostgreSQL sur {engine.url.host}:{engine.url.port}/{engine.url.database}")
+    # Vérifier que la connexion fonctionne
+    with engine.connect() as conn:
+        conn.execute("SELECT 1")
+        logger.info("Connexion à la base de données PostgreSQL établie avec succès")
+    
+    # Créer les tables
+    models.Base.metadata.create_all(bind=engine)
+    logger.info("Tables de base de données créées/vérifiées")
+except Exception as e:
+    logger.error(f"ERREUR CRITIQUE - Impossible de se connecter à la base de données: {e}")
+    # Afficher les détails de la configuration sans le mot de passe
+    from database.database import DB_HOST, DB_PORT, DB_NAME, DB_USER
+    logger.error(f"Configuration de la base de données: hôte={DB_HOST}, port={DB_PORT}, base={DB_NAME}, utilisateur={DB_USER}")
+    # Ne pas planter l'application - on va juste signaler l'erreur
+    logger.warning("L'application continue mais certaines fonctionnalités pourraient ne pas marcher sans base de données")
 
 # =============================================================================
 # INITIALISATION DE L'APPLICATION FastAPI
@@ -56,11 +72,16 @@ logger.info("Application FastAPI initialisée")
 # INDISPENSABLE pour que le frontend puisse communiquer avec le backend
 app.add_middleware(
     CORSMiddleware,
+    # Pour la production, spécifiez les domaines exacts au lieu de "*"
+    # "*" et allow_credentials=True sont incompatibles selon les navigateurs
     allow_origins=[
         "http://127.0.0.1:8000",
         "http://localhost:8000", 
-        "https://phishgard.usts.ai"
-    ],  # En production, restreindre à l'URL de votre frontend
+        "https://phishgard.usts.ai",
+        # Ajoutez l'URL de votre instance Coolify
+        "https://hk8484gs8wgso4scw0ckcc8s",
+        "https://phishgard.coolify.io"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -100,7 +121,7 @@ class UserResponse(BaseModel):
     google_id: str
 
     class Config:
-        orm_mode = True  # Permet à Pydantic de lire les données depuis un objet SQLAlchemy
+        from_attributes = True  # Version Pydantic V2 (remplacement de orm_mode)
 
 # =============================================================================
 # ENDPOINTS GÉNÉRAUX
