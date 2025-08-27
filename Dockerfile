@@ -35,7 +35,20 @@ ENV PATH="/opt/venv/bin:$PATH"
 RUN useradd --create-home appuser
 USER appuser
 
-# Commande pour démarrer l'application en production
-# Coolify peut surcharger le port, mais c'est bien de l'exposer
+# Expédier le port pour l'application
 EXPOSE 8000
-CMD ["gunicorn", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "-b", "0.0.0.0:8000", "main_api:app"]
+
+# Port configurable via variable d'environnement
+ENV PORT=8000 \
+    # Variables d'environnement pour la base de données Coolify
+    DB_HOST="hk8484gs8wgso4scw0ckcc8s" \
+    DB_PORT="5432" \
+    DB_USER="postgres" \
+    DB_PASSWORD="DGkv6CnuAcaIl6SfdQhfo4x3rxikvcZLBYQT53Ix6p1hBZufjfm3RTwmTuhKwRGx" \
+    DB_NAME="postgres" \
+    # Autres variables d'environnement nécessaires
+    ENV="production"
+
+# Commande pour démarrer l'application en production
+# Utilise le port configuré via variable d'environnement
+CMD ["gunicorn", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "-b", "0.0.0.0:${PORT}", "main_api:app"]
