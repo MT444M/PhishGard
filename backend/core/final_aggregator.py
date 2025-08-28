@@ -29,16 +29,23 @@ class FinalAggregator:
 
         # 2. Normalisation du score du modèle URL
         prob_phishing_str = self.url_model_results.get("probability_phishing", "0.0%")
-        # Gérer le cas où la clé n'existe pas
-        if prob_phishing_str:
-            prob_phishing = float(prob_phishing_str.strip('%'))
-        else:
-            prob_phishing = 50.0 # Neutre si non disponible
+        # Gérer le cas où la clé n'existe pas ou est invalide
+        try:
+            if prob_phishing_str and prob_phishing_str != "N/A":
+                prob_phishing = float(prob_phishing_str.strip('%'))
+            else:
+                prob_phishing = 50.0 # Neutre si non disponible
+        except (ValueError, TypeError):
+            prob_phishing = 50.0 # Valeur par défaut en cas d'erreur
         normalized_score_url = 100 - (2 * prob_phishing)
         
         # 3. Normalisation du score du LLM
         llm_class = self.llm_results.get("classification", "LEGITIME")
-        llm_conf = int(self.llm_results.get("confidence_score", 0))
+        llm_conf_str = self.llm_results.get("confidence_score", "0")
+        try:
+            llm_conf = int(llm_conf_str)
+        except (ValueError, TypeError):
+            llm_conf = 0 # Valeur par défaut en cas d'erreur
         magnitude = llm_conf * 10
         normalized_score_llm = -magnitude if llm_class == 'PHISHING' else magnitude
         
@@ -91,11 +98,16 @@ class FinalAggregator:
 
     def _build_report(self):
         """Construit le dictionnaire de rapport final."""
+        # Gestion des cas où le score final pourrait être NaN
+        final_score = self.final_score
+        if final_score != final_score:  # Vérifie si c'est NaN
+            final_score = 0.0
+            
         report = {
             "id_email": self.email_id,
             "phishgard_verdict": self.final_classification,
-            "confidence_score": f"{round(abs(self.final_score), 2)}%",
-            "final_score_internal": round(self.final_score, 2),
+            "confidence_score": f"{round(abs(final_score), 2)}%",
+            "final_score_internal": round(final_score, 2),
             "summary": "Agrégation des analyses heuristique, URL et LLM."
         }
         if self.veto_applied:

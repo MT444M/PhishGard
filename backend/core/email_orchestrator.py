@@ -37,7 +37,15 @@ class EmailOrchestrator:
         Initialise les analyseurs nécessaires et stocke la session de base de données.
         """
         self.db = db
-        self.llm_analyzer_instance = llm_analyzer.LLMAnalyzer()
+        # Initialisation paresseuse du LLMAnalyzer pour éviter de charger le modèle à chaque fois
+        self._llm_analyzer_instance = None
+
+    @property
+    def llm_analyzer_instance(self):
+        """Initialise le LLMAnalyzer seulement quand nécessaire"""
+        if self._llm_analyzer_instance is None:
+            self._llm_analyzer_instance = llm_analyzer.LLMAnalyzer()
+        return self._llm_analyzer_instance
 
     # --- MÉTHODE D'ANALYSE ENTIÈREMENT MISE À JOUR ---
     def run_full_analysis(self, email_data: dict, gmail_service, user_id: str):
