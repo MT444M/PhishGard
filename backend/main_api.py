@@ -340,10 +340,10 @@ def get_dashboard_data(
 app.mount("/", StaticFiles(directory="static", html=True), name="static")
 logger.info("Dossier static monté avec succès")
 
-# =============================================================================
-# DÉMARRAGE DU SERVEUR
-# =============================================================================
-if __name__ == "__main__":
-    logger.info("Démarrage du serveur PhishGard-AI sur http://127.0.0.1:8000")
-    # Pour un rechargement automatique lors des modifications de code
-    uvicorn.run("main_api:app", host="0.0.0.0", port=8000, reload=True)
+# # =============================================================================
+# # DÉMARRAGE DU SERVEUR
+# # =============================================================================
+# if __name__ == "__main__":
+#     logger.info("Démarrage du serveur PhishGard-AI sur http://127.0.0.1:8000")
+#     # Pour un rechargement automatique lors des modifications de code
+#     uvicorn.run("main_api:app", host="0.0.0.0", port=8000, reload=True)
