@@ -1,7 +1,7 @@
 # Dockerfile mis à jour pour GPU
 
 # --- Étape 1: Build ---
-FROM nvidia/cuda:12.1.1-runtime-ubuntu22.04 as builder
+FROM nvidia/cuda:12.1.1-runtime-ubuntu22.04 AS builder
 
 # Installe les dépendances système comme Python et pip
 RUN apt-get update && apt-get install -y \
@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
-COPY requirements.txt .
+COPY backend/requirements.txt .
 
 # Utilise python3.11 explicitement
 RUN python3.11 -m venv /opt/venv && \
@@ -28,7 +28,7 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 COPY --from=builder /opt/venv /opt/venv
-COPY . .
+COPY backend/ .
 ENV PATH="/opt/venv/bin:$PATH"
 
 RUN useradd --create-home appuser
