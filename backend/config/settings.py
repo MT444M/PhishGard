@@ -27,7 +27,7 @@ GOOGLE_TOKEN_URI = "https://oauth2.googleapis.com/token"
 # --- Configuration de l'application Frontend ---
 # L'URL vers laquelle l'utilisateur est redirigé après une authentification réussie.
 # Puisque le frontend est maintenant servi par le backend, on redirige vers la racine.
-FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:8000/")
+FRONTEND_URL = os.getenv("FRONTEND_URL", "https://phishgard.paulette.usts.ai")
 
 
 

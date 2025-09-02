@@ -83,11 +83,9 @@ def auth_callback(code: str, response: Response, db: Session = Depends(get_db)):
             key="access_token",
             value=jwt_token,
             httponly=True,
-            secure= False, # Mettre à True en production (nécessite HTTPS)
-            domain= "localhost",
-            # On omet samesite pour laisser le navigateur utiliser sa politique
-            # par défaut pour localhost, qui est souvent plus permissive.
-            # samesite='lax'
+            secure=True, # Mettre à True en production (nécessite HTTPS)
+            domain="phishgard.paulette.usts.ai",
+            samesite='lax'
         )
         return response
 
@@ -104,5 +102,5 @@ def logout():
     Déconnecte l'utilisateur en supprimant le cookie de session.
     """
     response = JSONResponse(content={"message": "Déconnexion réussie"})
-    response.delete_cookie("access_token", domain="localhost")
+    response.delete_cookie("access_token", domain="phishgard.paulette.usts.ai")
     return response
