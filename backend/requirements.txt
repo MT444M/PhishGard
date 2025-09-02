@@ -36,4 +36,5 @@ gunicorn
 
 # database
 # "sqlalchemy[asyncio]" aiosqlite
+sqlalchemy
 psycopg2-binary # pour postgresql
