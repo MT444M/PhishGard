@@ -1,4 +1,4 @@
-PhishGard-AI/
+PhishGard-AI/backend/
 │
 ├── config/
 │   ├── __init__.py

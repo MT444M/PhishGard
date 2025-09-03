@@ -47,6 +47,7 @@ load_dotenv()
 
 # L'URL de la base de données est lue depuis les variables d'environnement.
 # Si la variable n'existe pas, une URL SQLite par défaut est utilisée pour le développement.
+# En production avec Docker, DATABASE_URL est fournie via docker-compose
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./phishgard.db")
 
 
