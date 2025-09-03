@@ -1,4 +1,4 @@
-# Dockerfile mis à jour pour GPU avec PPA pour Python 3.11
+# Dockerfile final corrigé
 
 # --- Étape 1: Build ---
 FROM ubuntu:22.04 AS builder
@@ -25,7 +25,8 @@ RUN python3.11 -m venv /opt/venv && \
     /opt/venv/bin/pip install --no-cache-dir -r requirements.txt
 
 # --- Étape 2: Production ---
-FROM nvidia/cuda:12.1.1-runtime-ubuntu22.04
+# On utilise l'image -devel qui est plus complète et contient les paquets de base
+FROM nvidia/cuda:12.1.1-devel-ubuntu22.04
 
 # Installe les dépendances et Python 3.11 depuis le PPA
 RUN apt-get update && \
