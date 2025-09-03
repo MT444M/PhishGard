@@ -6,8 +6,8 @@ services:
   # Service de l'application FastAPI
   app:
     build:
-      context: ./backend  # Le contexte est le dossier 'backend'
-      dockerfile: Dockerfile # Le nom du Dockerfile à l'intérieur de 'backend'
+      context: .  # Le contexte est le répertoire racine
+      dockerfile: Dockerfile # Le Dockerfile est à la racine
     restart: unless-stopped
     depends_on:
       - db # S'assure que la base de données est démarrée avant l'application
