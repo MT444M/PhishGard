@@ -36,8 +36,8 @@ services:
     ports:
       - "8000:8000"
     
-    # --- Section GPU (TRÈS IMPORTANT) ---
-    # Votre Dockerfile utilise nvidia/cuda, il faut donc demander un GPU.
+    # --- Section GPU ---
+    # The NVIDIA PyTorch image already includes GPU support
     deploy:
       resources:
         reservations:
