@@ -21,11 +21,21 @@ services:
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
       
+      # --- OSINT API Keys ---
+      - IPINFO_API_KEY=${IPINFO_API_KEY}
+      - ABUSEIPDB_API_KEY=${ABUSEIPDB_API_KEY}
+      
+      # --- Security Keys ---
+      - FERNET_KEY=${FERNET_KEY}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - ALGORITHM=HS256 # Algorithme pour JWT
+      
       # --- Configuration de l'application ---
       - FRONTEND_URL=${FRONTEND_URL} # ex: https://phishgard.paulette.usts.ai
-      - JWT_SECRET_KEY=${JWT_SECRET_KEY} # Un secret long et aléatoire
-      - ALGORITHM=HS256 # Algorithme pour JWT, à vérifier dans votre auth_service.py
 
+    ports:
+      - "8000:8000"
+    
     # --- Section GPU (TRÈS IMPORTANT) ---
     # Votre Dockerfile utilise nvidia/cuda, il faut donc demander un GPU.
     deploy:
