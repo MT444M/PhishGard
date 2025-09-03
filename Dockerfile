@@ -1,16 +1,22 @@
-# Dockerfile final corrigé
+# Dockerfile final, version robuste
 
 # --- Étape 1: Build ---
 FROM ubuntu:22.04 AS builder
 
-# Installe les dépendances nécessaires pour ajouter des PPA, puis Python 3.11
-RUN apt-get update && \
+# Étape de fiabilisation : Installation des certificats et nettoyage forcé
+# Ceci est pour contrer les problèmes de réseau dans l'environnement de build
+RUN apt-get update -y && \
+    apt-get install -y --no-install-recommends ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
+
+# Installation des dépendances et de Python
+RUN apt-get update -y && \
     apt-get install -y --no-install-recommends \
     software-properties-common \
     gnupg \
     curl && \
-    add-apt-repository ppa:deadsnakes/ppa && \
-    apt-get update && \
+    add-apt-repository ppa:deadsnakes/ppa -y && \
+    apt-get update -y && \
     apt-get install -y --no-install-recommends \
     python3.11 \
     python3-pip \
@@ -19,22 +25,25 @@ RUN apt-get update && \
 
 WORKDIR /app
 COPY backend/requirements.txt .
-# Utilise python3.11 explicitement
 RUN python3.11 -m venv /opt/venv && \
     /opt/venv/bin/pip install --upgrade pip && \
     /opt/venv/bin/pip install --no-cache-dir -r requirements.txt
 
 # --- Étape 2: Production ---
-# On utilise l'image -devel qui est plus complète et contient les paquets de base
 FROM nvidia/cuda:12.1.1-devel-ubuntu22.04
 
-# Installe les dépendances et Python 3.11 depuis le PPA
-RUN apt-get update && \
+# Étape de fiabilisation identique pour l'image de production
+RUN apt-get update -y && \
+    apt-get install -y --no-install-recommends ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
+
+# Installation de Python sur l'image de production
+RUN apt-get update -y && \
     apt-get install -y --no-install-recommends \
     software-properties-common \
     gnupg && \
-    add-apt-repository ppa:deadsnakes/ppa && \
-    apt-get update && \
+    add-apt-repository ppa:deadsnakes/ppa -y && \
+    apt-get update -y && \
     apt-get install -y --no-install-recommends \
     python3.11 && \
     rm -rf /var/lib/apt/lists/*
@@ -48,6 +57,5 @@ RUN useradd --create-home appuser
 USER appuser
 
 EXPOSE 8000
-# On ajoute la variable d'environnement pour que PyTorch voie le GPU
 ENV NVIDIA_VISIBLE_DEVICES=all
 CMD ["gunicorn", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "-b", "0.0.0.0:8000", "main_api:app"]
