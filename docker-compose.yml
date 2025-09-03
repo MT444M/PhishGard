@@ -34,7 +34,7 @@ services:
       - FRONTEND_URL=${FRONTEND_URL} # ex: https://phishgard.paulette.usts.ai
 
     ports:
-      - "8000:8000"
+      - "8080:8000"
     
     # --- Section GPU ---
     # The NVIDIA PyTorch image already includes GPU support
