@@ -1,14 +1,19 @@
 # Dockerfile mis à jour pour GPU
 
 # --- Étape 1: Build ---
-FROM nvidia/cuda:12.1.1-runtime-ubuntu22.04 AS builder
+FROM ubuntu:22.04 AS builder
 
-# Installe les dépendances système comme Python et pip
-RUN apt-get update && apt-get install -y \
+# Install system dependencies with retry and better error handling
+RUN for i in {1..3}; do \
+    apt-get update && \
+    apt-get install -y --no-install-recommends \
     python3.11 \
     python3-pip \
     python3.11-venv \
-    && rm -rf /var/lib/apt/lists/*
+    curl && \
+    rm -rf /var/lib/apt/lists/* && \
+    break; \
+  done || (echo "Failed to install system dependencies after 3 attempts" && exit 1)
 
 WORKDIR /app
 COPY backend/requirements.txt .
@@ -21,10 +26,14 @@ RUN python3.11 -m venv /opt/venv && \
 # --- Étape 2: Production ---
 FROM nvidia/cuda:12.1.1-runtime-ubuntu22.04
 
-# Installe python3.11 (nécessaire pour l'exécution)
-RUN apt-get update && apt-get install -y \
-    python3.11 \
-    && rm -rf /var/lib/apt/lists/*
+# Install Python 3.11 (required for execution) with retry logic
+RUN for i in {1..3}; do \
+    apt-get update && \
+    apt-get install -y --no-install-recommends \
+    python3.11 && \
+    rm -rf /var/lib/apt/lists/* && \
+    break; \
+  done || (echo "Failed to install python3.11 after 3 attempts" && exit 1)
 
 WORKDIR /app
 COPY --from=builder /opt/venv /opt/venv
