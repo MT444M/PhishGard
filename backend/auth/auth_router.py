@@ -79,12 +79,16 @@ def auth_callback(code: str, response: Response, db: Session = Depends(get_db)):
         
         # Stocker le JWT dans un cookie HttpOnly sécurisé
         response = RedirectResponse(url=settings.FRONTEND_URL) # Redirige vers le frontend
+        
+        # Determine cookie security settings based on domain
+        is_production = settings.CALLBACK_DOMAIN != "localhost"
+        
         response.set_cookie(
             key="access_token",
             value=jwt_token,
             httponly=True,
-            secure=True, # Mettre à True en production (nécessite HTTPS)
-            domain="phishgard.paulette.usts.ai",
+            secure=is_production, # Secure only in production (HTTPS required)
+            domain=settings.CALLBACK_DOMAIN if is_production else None,
             samesite='lax'
         )
         return response
@@ -101,6 +105,13 @@ def logout():
     """
     Déconnecte l'utilisateur en supprimant le cookie de session.
     """
+    from config import settings
+    
     response = JSONResponse(content={"message": "Déconnexion réussie"})
-    response.delete_cookie("access_token", domain="phishgard.paulette.usts.ai")
+    
+    # Determine cookie domain based on environment
+    is_production = settings.CALLBACK_DOMAIN != "localhost"
+    domain = settings.CALLBACK_DOMAIN if is_production else None
+    
+    response.delete_cookie("access_token", domain=domain)
     return response

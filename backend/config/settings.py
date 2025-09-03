@@ -29,6 +29,10 @@ GOOGLE_TOKEN_URI = "https://oauth2.googleapis.com/token"
 # Puisque le frontend est maintenant servi par le backend, on redirige vers la racine.
 FRONTEND_URL = os.getenv("FRONTEND_URL", "https://phishgard.paulette.usts.ai")
 
+# --- Configuration du domaine de callback ---
+# Détermine le domaine pour les cookies et les redirections OAuth
+CALLBACK_DOMAIN = os.getenv("CALLBACK_DOMAIN", "localhost")
+
 
 
 # --- Configuration du chiffrement ---

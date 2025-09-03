@@ -32,6 +32,7 @@ from core import email_client
 from database import models
 from database.database import engine, get_db
 
+from config import settings
 from auth import auth_router, auth_service
 
 # =============================================================================
@@ -57,7 +58,7 @@ logger.info("Application FastAPI initialisée")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "https://phishgard.paulette.usts.ai"
+        settings.FRONTEND_URL
     ],  # En production, restreindre à l'URL de votre frontend
     allow_credentials=True,
     allow_methods=["*"],

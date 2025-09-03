@@ -6,10 +6,12 @@ FROM nvcr.io/nvidia/pytorch:23.10-py3
 WORKDIR /app
 
 # Copy application code
-COPY backend/ .
-
-# Install Python dependencies
+# Copy requirements first to leverage Docker cache
+COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the rest of the application code
+COPY backend/ .
 
 # Create non-root user
 RUN useradd --create-home appuser

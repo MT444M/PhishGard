@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  # Service de l'application FastAPI
+  app:
+    build:
+      context: .  # Le contexte est le répertoire racine
+      dockerfile: Dockerfile.test # Le Dockerfile de test
+    restart: unless-stopped
+    depends_on:
+      - db # S'assure que la base de données est démarrée avant l'application
+    environment:
+      # --- Configuration de la base de données ---
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      
+      # --- Secrets d'authentification Google ---
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      
+      # --- OSINT API Keys ---
+      - IPINFO_API_KEY=${IPINFO_API_KEY}
+      - ABUSEIPDB_API_KEY=${ABUSEIPDB_API_KEY}
+      
+      # --- Security Keys ---
+      - FERNET_KEY=${FERNET_KEY}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - ALGORITHM=HS256 # Algorithme pour JWT
+      
+      # --- Configuration de l'application ---
+      - FRONTEND_URL=http://localhost:8000 # URL locale pour testing
+
+    ports:
+      - "8000:8000"
+
+  # Service de la base de données PostgreSQL
+  db:
+    image: postgres:15-alpine # Une image PostgreSQL légère et récente
+    restart: unless-stopped
+    volumes:
+      - postgres_data:/var/lib/postgresql/data # Persistance des données
+    environment:
+      # Ces variables seront à définir dans l'onglet "Secrets" de Coolify
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+
+volumes:
+  postgres_data: # Définit le volume pour la persistance des données
