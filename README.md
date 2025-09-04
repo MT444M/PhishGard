@@ -1,7 +1,6 @@
 # PhishGard - AI-Powered Phishing Analysis Platform
 
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/MT444M/PhishGard)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 PhishGard est une plateforme avancée conçue pour automatiser la détection, l'analyse et la réponse aux menaces de phishing. En combinant l'analyse par des modèles de langage (LLM) locaux, l'enrichissement via des sources de renseignement ouvertes (OSINT) et des analyses heuristiques approfondies, PhishGard fournit une évaluation complète du risque pour chaque email et URL suspect.
 
@@ -111,5 +110,3 @@ Les contributions sont les bienvenues ! Si vous souhaitez améliorer PhishGard, 
 5.  Ouvrez une Pull Request.
 
 ## 📄 Licence
-
-Ce projet est sous licence MIT.
